@@ -6,17 +6,19 @@
 // instead of getting the arduino to communicate with my 
 // server code, but I may be wrong...
 
-#include <SPI.h>
 #include <Ethernet.h>
 
 // server location
 char serverName[] = "eaglezrserver.ddns.net";
 
 // local internet settings
-byte ip[] = {192, 168, 1, x}; // don't be an idiot and forget about this...
+byte ip[] = {192, 168, 1, 124}; // don't be an idiot and forget about this...
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xED, 0xAD };
 byte gateway[] = {192, 168, 1, 1};
 byte subnet[] = {255, 255, 255, 0};
+
+// LED pins
+
 
 EthernetClient client;
 String command;
@@ -26,11 +28,8 @@ int currTime = 0;
 
 // Establish the Ethernet connection
 void setup() {
-  if (Ethernet.begin(mac, ip) == 0 {
-    errorLights(1);
-    Serial.println("Ethernet failed to configure.");
-    while (true);
-  }
+  Ethernet.begin(mac, ip);
+
 
   Serial.begin(9600);
   Serial.println("Setup...");
@@ -50,7 +49,7 @@ void loop() {
 // Receive the command from the server
 void getCommand(){
   // 1. connect to server
-  if(client.connect(serverName, 11896) { 
+  if(client.connect(serverName, 11896)) { 
      Serial.println("Connected");
      
   } else {

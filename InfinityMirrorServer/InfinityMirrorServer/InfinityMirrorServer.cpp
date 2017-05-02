@@ -1,13 +1,6 @@
 #include "InfinityMirrorServer.h"
 
-
-
-InfinityMirrorServer::InfinityMirrorServer() {
-}
-
 int main() {
-	
-}
 
-InfinityMirrorServer::~InfinityMirrorServer() {
+	return 0;
 }

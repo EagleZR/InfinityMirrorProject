@@ -27,7 +27,7 @@ public class InfinityMirrorDesktopClient extends Application {
 	Button onOffButton;
 	Button whiteLightModeButton;
 	int port = 11896;
-	String url = "192.168.1.135";
+	String url = "eaglezrserver.ddns.net";
 	
 	/**
 	 * Included for Eclipse
@@ -270,7 +270,6 @@ public class InfinityMirrorDesktopClient extends Application {
 			DataInputStream in = new DataInputStream( socket.getInputStream() );
 			DataOutputStream out = new DataOutputStream( socket.getOutputStream() );
 			out.write( command );
-			// out.writeInt( command );
 			response = in.read();
 			socket.close();
 		} catch ( IOException e ) {
