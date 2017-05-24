@@ -1,7 +1,4 @@
 #pragma once
-class InfinityMirrorServer {
-public:
-	InfinityMirrorServer();
-	~InfinityMirrorServer();
-};
+#include <cstdio>
+
 

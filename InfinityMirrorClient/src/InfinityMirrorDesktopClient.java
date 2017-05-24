@@ -4,15 +4,19 @@ import java.io.IOException;
 import java.net.Socket;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -20,14 +24,159 @@ import javafx.stage.StageStyle;
 
 public class InfinityMirrorDesktopClient extends Application {
 	
-	boolean lightsOn = true;
-	Stage primaryStage;
-	MenuItem menuTurnOnLights;
-	MenuItem menuTurnOffLights;
-	Button onOffButton;
-	Button whiteLightModeButton;
-	int port = 11896;
-	String url = "eaglezrserver.ddns.net";
+	private boolean lightsOn = true;
+	private Stage primaryStage;
+	private MenuItem menuTurnOnLights;
+	private MenuItem menuTurnOffLights;
+	private Button onOffButton;
+	private Button whiteLightModeButton;
+	private int port = 11896;
+	private String url = "192.168.1.158";
+	private Color primaryColor = Color.BLUE; // Might want another to differentiate between modes
+	private Color secondaryColor = Color.RED;
+	
+	private Panes panes;
+	
+	private class Panes {
+		public Pane mainPane;
+		public Pane solidColorModePane;
+		public Pane desktopHarmonyModePane;
+		public Pane soundResponsiveModePane;
+		public Pane musicResponsiveModePane;
+		
+		public Panes() {
+			this.mainPane = buildMainMenuPane();
+			this.solidColorModePane = buildSolidColorModePane();
+			this.desktopHarmonyModePane = buildDesktopHarmonyModePane();
+			this.soundResponsiveModePane = buildSoundResponsiveModePane();
+			this.musicResponsiveModePane = buildMusicResponsiveModePane();
+		}
+		
+		private Pane buildMainMenuPane() {
+			// Create instructional label
+			Label instructionalLabel = new Label( "Select the desired mode: " );
+			
+			// Create modal control buttons
+			Button solidColorModeButton = new Button( "Solid Color Mode" );
+			solidColorModeButton.setOnAction( new EventHandler<ActionEvent>(){
+				@Override
+				public void handle( ActionEvent event ) {
+					displayPane( panes.solidColorModePane );
+				}
+			});
+			Button desktopHarmonyModeButton = new Button( "Desktop Visual \nHarmony Mode" );
+			desktopHarmonyModeButton.setOnAction( new EventHandler<ActionEvent>(){
+				@Override
+				public void handle( ActionEvent event ) {
+					displayPane( panes.desktopHarmonyModePane );
+				}
+			});
+			Button soundResponsiveModeButton = new Button( "Sound Responsive Mode" );
+			soundResponsiveModeButton.setOnAction( new EventHandler<ActionEvent>(){
+				@Override
+				public void handle( ActionEvent event ) {
+					displayPane( panes.soundResponsiveModePane );
+				}
+			});
+			Button musicResponsiveModeButton = new Button( "Music Responsive Mode" );
+			musicResponsiveModeButton.setOnAction( new EventHandler<ActionEvent>(){
+				@Override
+				public void handle( ActionEvent event ) {
+					displayPane( panes.musicResponsiveModePane );
+				}
+			});
+			
+			// Add modal control buttons to modal control pane
+			GridPane modalControlPane = new GridPane();
+			
+			modalControlPane.add( solidColorModeButton, 0, 0 );
+			solidColorModeButton.prefWidthProperty().bind( modalControlPane.widthProperty().divide( 2.0 ) );
+			desktopHarmonyModeButton.prefHeightProperty().bind( modalControlPane.heightProperty().divide( 2.0 ) );
+			
+			modalControlPane.add( desktopHarmonyModeButton, 1, 0 );
+			desktopHarmonyModeButton.prefWidthProperty().bind( modalControlPane.widthProperty().divide( 2.0 ) );
+			solidColorModeButton.prefHeightProperty().bind( modalControlPane.heightProperty().divide( 2.0 ) );
+			
+			modalControlPane.add( soundResponsiveModeButton, 0, 1 );
+			soundResponsiveModeButton.prefWidthProperty().bind( modalControlPane.widthProperty().divide( 2.0 ) );
+			soundResponsiveModeButton.prefHeightProperty().bind( modalControlPane.heightProperty().divide( 2.0 ) );
+			
+			modalControlPane.add( musicResponsiveModeButton, 1, 1 );
+			musicResponsiveModeButton.prefWidthProperty().bind( modalControlPane.widthProperty().divide( 2.0 ) );
+			musicResponsiveModeButton.prefHeightProperty().bind( modalControlPane.heightProperty().divide( 2.0 ) );
+			
+			// Create primary control buttons
+			whiteLightModeButton = new Button( "Toggle White Light" );
+			whiteLightModeButton.setOnAction( new ToggleWhiteLightMode() );
+			onOffButton = ( lightsOn ? new Button( "Turn Off Lights" ) : new Button( "Turn On Lights" ) );
+			onOffButton.setOnAction( new ToggleLightsOnOff() );
+			
+			// Add primary control buttons to bottom pane
+			GridPane primaryControlPane = new GridPane();
+			
+			primaryControlPane.add( whiteLightModeButton, 0, 0 );
+			whiteLightModeButton.prefWidthProperty().bind( primaryControlPane.widthProperty().divide( 2.0 ) );
+			whiteLightModeButton.prefHeightProperty().bind( primaryControlPane.heightProperty() );
+			
+			primaryControlPane.add( onOffButton, 1, 0 );
+			onOffButton.prefWidthProperty().bind( primaryControlPane.widthProperty().divide( 2.0 ) );
+			onOffButton.prefHeightProperty().bind( primaryControlPane.heightProperty() );
+			
+			// Create Application Pane
+			BorderPane mainMenuPane = new BorderPane();
+			mainMenuPane.setTop( instructionalLabel );
+			mainMenuPane.setCenter( modalControlPane );
+			mainMenuPane.setBottom( primaryControlPane );
+			
+			return mainMenuPane;
+		}
+		
+		private Pane buildSubMenuPane( Pane subMenuContentPane ) {
+			Button backButton = new Button( "<-- Back" );
+			backButton.setOnAction( new MainMenuSelected() );
+			BorderPane subMenuPane = new BorderPane();
+			subMenuPane.setTop( backButton );
+			subMenuPane.setCenter( subMenuContentPane );
+			return subMenuPane;
+		}
+		
+		private Pane buildSolidColorModePane() {
+			BorderPane contentPane = new BorderPane();
+			ColorPicker colorPicker = new ColorPicker();
+			colorPicker.setOnAction( new EventHandler<ActionEvent>() {
+				@Override
+				public void handle( ActionEvent event ) {
+					primaryColor = colorPicker.getValue();
+				}
+			} );
+			contentPane.setTop( colorPicker );
+			Button startSolidColorModeButton = new Button( "Start Solid Color Mode" );
+			startSolidColorModeButton.setOnAction( new EventHandler<ActionEvent>(){
+				@Override
+				public void handle( ActionEvent event ) {
+					sendCommand (3);
+				}
+			});
+			contentPane.setBottom( startSolidColorModeButton );
+			return buildSubMenuPane( contentPane );
+		}
+		
+		private Pane buildDesktopHarmonyModePane() {
+			Pane contentPane = new Pane();
+			return buildSubMenuPane( contentPane ); // TODO
+		}
+		
+		private Pane buildSoundResponsiveModePane() {
+			Pane contentPane = new Pane();
+			return buildSubMenuPane( contentPane ); // TODO
+		}
+		
+		private Pane buildMusicResponsiveModePane() {
+			Pane contentPane = new Pane();
+			return buildSubMenuPane( contentPane ); // TODO
+		}
+		
+	}
 	
 	/**
 	 * Included for Eclipse
@@ -41,7 +190,8 @@ public class InfinityMirrorDesktopClient extends Application {
 	@Override
 	public void start( Stage stage ) throws Exception {
 		this.primaryStage = stage;
-		displayPane( buildMainMenuPane() );
+		this.panes = new Panes();
+		displayPane( panes.solidColorModePane );
 	}
 	
 	private MenuBar buildMenuBar() {
@@ -90,134 +240,14 @@ public class InfinityMirrorDesktopClient extends Application {
 		this.primaryStage.show();
 	}
 	
-	private Pane buildMainMenuPane() {
-		// Create instructional label
-		Label instructionalLabel = new Label( "Select the desired mode: " );
-		
-		// Create modal control buttons
-		Button solidColorModeButton = new Button( "Solid Color Mode" );
-		solidColorModeButton.setOnAction( new SolidColorModeSelected() );
-		Button desktopHarmonyModeButton = new Button( "Desktop Visual \nHarmony Mode" );
-		desktopHarmonyModeButton.setOnAction( new DesktopHarmonyModeSelected() );
-		Button soundResponsiveModeButton = new Button( "Sound Responsive Mode" );
-		soundResponsiveModeButton.setOnAction( new SoundResponsiveModeSelected() );
-		Button musicResponsiveModeButton = new Button( "Music Responsive Mode" );
-		musicResponsiveModeButton.setOnAction( new MusicResponsiveModeSelected() );
-		
-		// Add modal control buttons to modal control pane
-		GridPane modalControlPane = new GridPane();
-		
-		modalControlPane.add( solidColorModeButton, 0, 0 );
-		solidColorModeButton.prefWidthProperty().bind( modalControlPane.widthProperty().divide( 2.0 ) );
-		desktopHarmonyModeButton.prefHeightProperty().bind( modalControlPane.heightProperty().divide( 2.0 ) );
-		
-		modalControlPane.add( desktopHarmonyModeButton, 1, 0 );
-		desktopHarmonyModeButton.prefWidthProperty().bind( modalControlPane.widthProperty().divide( 2.0 ) );
-		solidColorModeButton.prefHeightProperty().bind( modalControlPane.heightProperty().divide( 2.0 ) );
-		
-		modalControlPane.add( soundResponsiveModeButton, 0, 1 );
-		soundResponsiveModeButton.prefWidthProperty().bind( modalControlPane.widthProperty().divide( 2.0 ) );
-		soundResponsiveModeButton.prefHeightProperty().bind( modalControlPane.heightProperty().divide( 2.0 ) );
-		
-		modalControlPane.add( musicResponsiveModeButton, 1, 1 );
-		musicResponsiveModeButton.prefWidthProperty().bind( modalControlPane.widthProperty().divide( 2.0 ) );
-		musicResponsiveModeButton.prefHeightProperty().bind( modalControlPane.heightProperty().divide( 2.0 ) );
-		
-		// Create primary control buttons
-		whiteLightModeButton = new Button( "Toggle White Light" );
-		whiteLightModeButton.setOnAction( new ToggleWhiteLightMode() );
-		onOffButton = ( lightsOn ? new Button( "Turn Off Lights" ) : new Button( "Turn On Lights" ) );
-		onOffButton.setOnAction( new ToggleLightsOnOff() );
-		
-		// Add primary control buttons to bottom pane
-		GridPane primaryControlPane = new GridPane();
-		
-		primaryControlPane.add( whiteLightModeButton, 0, 0 );
-		whiteLightModeButton.prefWidthProperty().bind( primaryControlPane.widthProperty().divide( 2.0 ) );
-		whiteLightModeButton.prefHeightProperty().bind( primaryControlPane.heightProperty() );
-		
-		primaryControlPane.add( onOffButton, 1, 0 );
-		onOffButton.prefWidthProperty().bind( primaryControlPane.widthProperty().divide( 2.0 ) );
-		onOffButton.prefHeightProperty().bind( primaryControlPane.heightProperty() );
-		
-		// Create Application Pane
-		BorderPane mainMenuPane = new BorderPane();
-		mainMenuPane.setTop( instructionalLabel );
-		mainMenuPane.setCenter( modalControlPane );
-		mainMenuPane.setBottom( primaryControlPane );
-		
-		return mainMenuPane;
-	}
-	
-	private Pane buildSubMenuPane( Pane subMenuContentPane ) {
-		Button backButton = new Button( "Back" );
-		backButton.setOnAction( new MainMenuSelected() );
-		BorderPane subMenuPane = new BorderPane();
-		subMenuPane.setTop( backButton );
-		subMenuPane.setCenter( subMenuContentPane );
-		return subMenuPane;
-	}
-	
-	private Pane buildSolidColorModePane() {
-		Pane contentPane = new Pane();
-		return buildSubMenuPane( contentPane ); // TODO
-	}
-	
-	private Pane buildDesktopHarmonyModePane() {
-		Pane contentPane = new Pane();
-		return buildSubMenuPane( contentPane ); // TODO
-	}
-	
-	private Pane buildSoundResponsiveModePane() {
-		Pane contentPane = new Pane();
-		return buildSubMenuPane( contentPane ); // TODO
-	}
-	
-	private Pane buildMusicResponsiveModePane() {
-		Pane contentPane = new Pane();
-		return buildSubMenuPane( contentPane ); // TODO
-	}
-	
 	private class MainMenuSelected implements EventHandler<ActionEvent> {
 		
 		@Override
 		public void handle( ActionEvent event ) {
-			displayPane( buildMainMenuPane() );
+			displayPane( panes.mainPane );
 		}
 	}
-	
-	private class SolidColorModeSelected implements EventHandler<ActionEvent> {
-		
-		@Override
-		public void handle( ActionEvent event ) {
-			displayPane( buildSolidColorModePane() );
-		}
-	}
-	
-	private class DesktopHarmonyModeSelected implements EventHandler<ActionEvent> {
-		
-		@Override
-		public void handle( ActionEvent event ) {
-			displayPane( buildDesktopHarmonyModePane() );
-		}
-	}
-	
-	private class SoundResponsiveModeSelected implements EventHandler<ActionEvent> {
-		
-		@Override
-		public void handle( ActionEvent event ) {
-			displayPane( buildSoundResponsiveModePane() );
-		}
-	}
-	
-	private class MusicResponsiveModeSelected implements EventHandler<ActionEvent> {
-		
-		@Override
-		public void handle( ActionEvent event ) {
-			displayPane( buildMusicResponsiveModePane() );
-		}
-	}
-	
+
 	private class ToggleLightsOnOff implements EventHandler<ActionEvent> {
 		
 		@Override
@@ -263,7 +293,9 @@ public class InfinityMirrorDesktopClient extends Application {
 		}
 	}
 	
-	private int sendCommand( int command ) {
+	private int sendCommand( int command ) { // TODO app freezes if no response.
+												// Find a way to handle
+												// (threads?)
 		int response = -1;
 		try { // Any
 			Socket socket = new Socket( url, port );
@@ -273,7 +305,7 @@ public class InfinityMirrorDesktopClient extends Application {
 			response = in.read();
 			socket.close();
 		} catch ( IOException e ) {
-			displayError( "E1: Command not sent" );
+			displayError( "E1: Connection not made" );
 		}
 		return response;
 	}

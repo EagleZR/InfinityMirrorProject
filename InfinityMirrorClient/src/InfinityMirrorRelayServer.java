@@ -10,6 +10,7 @@ public class InfinityMirrorRelayServer {
 	private static int port = 11896;
 	private static DataInputStream in;
 	private static DataOutputStream out;
+	private static ServerSocket serverSocket;
 	
 	// Lamp Status Variables 
 	private static boolean lightsOn = true;
@@ -17,7 +18,7 @@ public class InfinityMirrorRelayServer {
 	
 	public static void main( String[] args ) {
 		try { // If this breaks, we're SOL, and the program will need to restart
-			ServerSocket serverSocket = new ServerSocket( port );
+			serverSocket = new ServerSocket( port );
 			// File log = new File("log" + )
 			while ( true ) {
 				try {
@@ -26,7 +27,7 @@ public class InfinityMirrorRelayServer {
 					out = new DataOutputStream( connection.getOutputStream() );
 					try { // Assuming misread input
 						int input = in.read();
-						// System.out.println( "Read: " + input );
+						System.out.println( "Read: " + input );
 						int output = -1;
 						if ( input == 1 ) { // Toggle on/off
 							lightsOn = !lightsOn;
@@ -37,7 +38,9 @@ public class InfinityMirrorRelayServer {
 							// TODO write to file
 							output = ( whiteLightMode ? 21 : 20 );
 						} else if ( input == 3 ) { // Solid Color Mode
-							// TODO
+							out.write( 3 ); // echo command
+							// TODO figure out how to read a color
+							// TODO set color to primary color, and change mode
 						} else if ( input == 4 ) { // Desktop Harmony Mode
 							// TODO
 						} else if ( input == 5 ) { // Sound Responsive Mode
@@ -51,16 +54,21 @@ public class InfinityMirrorRelayServer {
 						out.write( output );
 					} catch ( IOException e ) {
 						out.writeInt( -1 ); // error response
-						// System.out.println ( "There was an error sending the message" );
+						System.out.println ( "There was an error sending the message" );
 					}
 					connection.close();
 				} catch ( IOException e ) { // Trouble opening the connection
-					// System.out.println( "Connection cannot be made" );
+					System.out.println( "Connection cannot be made." );
 				}
 			}
 		} catch ( IOException e ) {
-			e.printStackTrace();
+			System.out.println( "The socket could not be opened." );
+		} finally {
+			try {
+				serverSocket.close();
+			} catch ( IOException e ) {
+				System.out.println( "The socket could not be closed." );
+			}
 		}
 	}
-	
 }
