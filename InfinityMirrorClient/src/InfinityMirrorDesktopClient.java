@@ -32,10 +32,13 @@ public class InfinityMirrorDesktopClient extends Application {
 	private Button whiteLightModeButton;
 	private int port = 11896;
 	private String url = "192.168.1.158";
-	private Color primaryColor = Color.BLUE; // Might want another to differentiate between modes
+	private Color primaryColor = Color.BLUE; // Might want another to
+												// differentiate between modes
 	private Color secondaryColor = Color.RED;
 	
 	private Panes panes;
+	
+	EventHandler displayMainMenu;
 	
 	private class Panes {
 		public Pane mainPane;
@@ -58,33 +61,16 @@ public class InfinityMirrorDesktopClient extends Application {
 			
 			// Create modal control buttons
 			Button solidColorModeButton = new Button( "Solid Color Mode" );
-			solidColorModeButton.setOnAction( new EventHandler<ActionEvent>(){
-				@Override
-				public void handle( ActionEvent event ) {
-					displayPane( panes.solidColorModePane );
-				}
-			});
+			solidColorModeButton.setOnAction( event -> displayPane( panes.solidColorModePane ) );
+			
 			Button desktopHarmonyModeButton = new Button( "Desktop Visual \nHarmony Mode" );
-			desktopHarmonyModeButton.setOnAction( new EventHandler<ActionEvent>(){
-				@Override
-				public void handle( ActionEvent event ) {
-					displayPane( panes.desktopHarmonyModePane );
-				}
-			});
+			desktopHarmonyModeButton.setOnAction( event -> displayPane( panes.desktopHarmonyModePane ) );
+			
 			Button soundResponsiveModeButton = new Button( "Sound Responsive Mode" );
-			soundResponsiveModeButton.setOnAction( new EventHandler<ActionEvent>(){
-				@Override
-				public void handle( ActionEvent event ) {
-					displayPane( panes.soundResponsiveModePane );
-				}
-			});
+			soundResponsiveModeButton.setOnAction( event -> displayPane( panes.soundResponsiveModePane ) );
+			
 			Button musicResponsiveModeButton = new Button( "Music Responsive Mode" );
-			musicResponsiveModeButton.setOnAction( new EventHandler<ActionEvent>(){
-				@Override
-				public void handle( ActionEvent event ) {
-					displayPane( panes.musicResponsiveModePane );
-				}
-			});
+			musicResponsiveModeButton.setOnAction( event -> displayPane( panes.musicResponsiveModePane ) );
 			
 			// Add modal control buttons to modal control pane
 			GridPane modalControlPane = new GridPane();
@@ -133,7 +119,7 @@ public class InfinityMirrorDesktopClient extends Application {
 		
 		private Pane buildSubMenuPane( Pane subMenuContentPane ) {
 			Button backButton = new Button( "<-- Back" );
-			backButton.setOnAction( new MainMenuSelected() );
+			backButton.setOnAction( event -> displayPane(panes.mainPane) );
 			BorderPane subMenuPane = new BorderPane();
 			subMenuPane.setTop( backButton );
 			subMenuPane.setCenter( subMenuContentPane );
@@ -143,20 +129,10 @@ public class InfinityMirrorDesktopClient extends Application {
 		private Pane buildSolidColorModePane() {
 			BorderPane contentPane = new BorderPane();
 			ColorPicker colorPicker = new ColorPicker();
-			colorPicker.setOnAction( new EventHandler<ActionEvent>() {
-				@Override
-				public void handle( ActionEvent event ) {
-					primaryColor = colorPicker.getValue();
-				}
-			} );
+			colorPicker.setOnAction( event -> primaryColor = colorPicker.getValue() );
 			contentPane.setTop( colorPicker );
 			Button startSolidColorModeButton = new Button( "Start Solid Color Mode" );
-			startSolidColorModeButton.setOnAction( new EventHandler<ActionEvent>(){
-				@Override
-				public void handle( ActionEvent event ) {
-					sendCommand (3);
-				}
-			});
+			startSolidColorModeButton.setOnAction( event -> sendCommand( 3 ) );
 			contentPane.setBottom( startSolidColorModeButton );
 			return buildSubMenuPane( contentPane );
 		}
@@ -189,6 +165,8 @@ public class InfinityMirrorDesktopClient extends Application {
 	
 	@Override
 	public void start( Stage stage ) throws Exception {
+		displayMainMenu = event -> displayPane(panes.mainPane);
+		
 		this.primaryStage = stage;
 		this.panes = new Panes();
 		displayPane( panes.solidColorModePane );
@@ -199,7 +177,7 @@ public class InfinityMirrorDesktopClient extends Application {
 		Menu fileMenu = new Menu( "File" );
 		
 		MenuItem returnToMain = new MenuItem( "Main Menu" );
-		returnToMain.setOnAction( new MainMenuSelected() );
+		returnToMain.setOnAction( event -> displayPane(panes.mainPane) );
 		
 		MenuItem menuWhiteLightMode = new MenuItem( "Toggle White Light" );
 		menuWhiteLightMode.setOnAction( new ToggleWhiteLightMode() );
@@ -240,14 +218,14 @@ public class InfinityMirrorDesktopClient extends Application {
 		this.primaryStage.show();
 	}
 	
-	private class MainMenuSelected implements EventHandler<ActionEvent> {
-		
-		@Override
-		public void handle( ActionEvent event ) {
-			displayPane( panes.mainPane );
-		}
-	}
-
+//	private class MainMenuSelected implements EventHandler<ActionEvent> {
+//		
+//		@Override
+//		public void handle( ActionEvent event ) {
+//			displayPane( panes.mainPane );
+//		}
+//	}
+	
 	private class ToggleLightsOnOff implements EventHandler<ActionEvent> {
 		
 		@Override
