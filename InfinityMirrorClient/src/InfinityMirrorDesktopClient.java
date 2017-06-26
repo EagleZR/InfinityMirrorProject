@@ -2,6 +2,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -17,13 +21,17 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 public class InfinityMirrorDesktopClient extends Application {
 	
+	private static enum PaneTypes { SOLID_COLOR, ALTERNATING_COLOR, DESKTOP_HARMONY, SOUND_RESPONSIVE, MUSIC_RESPONSIVE };
+
 	private boolean lightsOn = true;
 	private Stage primaryStage;
 	private MenuItem menuTurnOnLights;
@@ -31,16 +39,32 @@ public class InfinityMirrorDesktopClient extends Application {
 	private Button onOffButton;
 	private Button whiteLightModeButton;
 	private int port = 11896;
+<<<<<<< HEAD
 	private String url = "192.168.1.158";
 	private Color primaryColor = Color.BLUE; // Might want another to
 												// differentiate between modes
+=======
+	private String url = "136.59.71.218";
+	private Color primaryColor = Color.BLUE; // Might want another to differentiate between modes
+>>>>>>> origin/master
 	private Color secondaryColor = Color.RED;
 	
+	private Pane animationPane;
+		
 	private Panes panes;
 	
 	EventHandler displayMainMenu;
 	
 	private class Panes {
+		
+		/**
+		 * # of LEDs per vertical part: 18 <p>
+		 * # of LEDs per horizontal part: 72 <p>
+		 * Total # of LEDs: 180
+		 */
+		Rectangle [] lights = new Rectangle[180];
+		Color [] colors = new Color[180];
+
 		public Pane mainPane;
 		public Pane solidColorModePane;
 		public Pane desktopHarmonyModePane;
@@ -48,11 +72,18 @@ public class InfinityMirrorDesktopClient extends Application {
 		public Pane musicResponsiveModePane;
 		
 		public Panes() {
+			
+			for (int i = 0; i < lights.length; i++ ) {
+				lights[i] = new Rectangle();
+			}
+			
 			this.mainPane = buildMainMenuPane();
 			this.solidColorModePane = buildSolidColorModePane();
 			this.desktopHarmonyModePane = buildDesktopHarmonyModePane();
 			this.soundResponsiveModePane = buildSoundResponsiveModePane();
 			this.musicResponsiveModePane = buildMusicResponsiveModePane();
+			
+			
 		}
 		
 		private Pane buildMainMenuPane() {
@@ -152,6 +183,26 @@ public class InfinityMirrorDesktopClient extends Application {
 			return buildSubMenuPane( contentPane ); // TODO
 		}
 		
+		private Pane buildInfinityMirorPane( int paneType ) {
+			Pane pane = new Pane();
+			
+			EventHandler<ActionEvent> eventHandler = e -> {
+				offsetColor();
+				colorLights(paneType);
+			};
+						
+			Timeline changingLights = new Timeline(new KeyFrame(Duration.millis(250), eventHandler));
+			
+			return pane;
+		}
+		
+		private void colorLights ( int paneType ) {
+			
+		}
+		
+		private void offsetColor() {
+			
+		}
 	}
 	
 	/**
