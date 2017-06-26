@@ -29,7 +29,7 @@ public class InfinityMirrorRelayServer {
 						int input = in.read();
 						System.out.println( "Read: " + input );
 						int output = -1;
-						if ( input == 1 ) { // Toggle on/off
+						if ( input == ClientCommands.LIGHTS.COMMAND ) { // Toggle on/off
 							lightsOn = !lightsOn;
 							// TODO write to file
 							output = ( lightsOn ? 11 : 10 );
@@ -38,7 +38,7 @@ public class InfinityMirrorRelayServer {
 							// TODO write to file
 							output = ( whiteLightMode ? 21 : 20 );
 						} else if ( input == 3 ) { // Solid Color Mode
-							out.write( 3 ); // echo command
+							output = 3; // echo command
 							// TODO figure out how to read a color
 							// TODO set color to primary color, and change mode
 						} else if ( input == 4 ) { // Desktop Harmony Mode
