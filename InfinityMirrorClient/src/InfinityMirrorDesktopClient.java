@@ -47,7 +47,7 @@ public class InfinityMirrorDesktopClient extends Application {
 	private Button whiteLightModeButton;
 	private Label outputLabel = new Label("");
 	private int port = 11896;
-	private String url = "10.100.93.107";
+	private String url = "136.59.71.218";
 	private Color primaryColor = Color.BLUE; // Might want another to
 	private Color secondaryColor = Color.RED;
 

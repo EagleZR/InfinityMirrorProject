@@ -3,6 +3,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Date;
+import java.util.function.Consumer;
 
 public class InfinityMirrorRelayServer {
 	
@@ -12,11 +14,17 @@ public class InfinityMirrorRelayServer {
 	private static DataOutputStream out;
 	private static ServerSocket serverSocket;
 	
-	// Lamp Status Variables 
+	// Lamp Status Variables
 	private static boolean lightsOn = true;
 	private static boolean whiteLightMode = false;
 	
+	private static Consumer<String> printer;
+	
 	public static void main( String[] args ) {
+		printer = s -> {
+			System.out.println( new Date( System.currentTimeMillis() ).toString() + ": " + s );
+		};
+		
 		try { // If this breaks, we're SOL, and the program will need to restart
 			serverSocket = new ServerSocket( port );
 			// File log = new File("log" + )
@@ -27,9 +35,10 @@ public class InfinityMirrorRelayServer {
 					out = new DataOutputStream( connection.getOutputStream() );
 					try { // Assuming misread input
 						int input = in.read();
-						System.out.println( "Read: " + input );
+						printer.accept( "Read: " + input );
 						int output = -1;
-						if ( input == ClientCommands.LIGHTS.COMMAND ) { // Toggle on/off
+						if ( input == ClientCommands.LIGHTS.COMMAND ) { // Toggle
+																		// on/off
 							lightsOn = !lightsOn;
 							// TODO write to file
 							output = ( lightsOn ? 11 : 10 );
@@ -50,24 +59,24 @@ public class InfinityMirrorRelayServer {
 						} else { // Input not recognized
 							out.writeInt( -1 ); // error response
 						}
-						System.out.println( output );
+						printer.accept( "Returned: " + output );
 						out.write( output );
 					} catch ( IOException e ) {
 						out.writeInt( -1 ); // error response
-						System.out.println ( "There was an error sending the message" );
+						printer.accept( "There was an error sending the message" );
 					}
 					connection.close();
 				} catch ( IOException e ) { // Trouble opening the connection
-					System.out.println( "Connection cannot be made." );
+					printer.accept( "Connection cannot be made." );
 				}
 			}
 		} catch ( IOException e ) {
-			System.out.println( "The socket could not be opened." );
+			printer.accept( "The socket could not be opened." );
 		} finally {
 			try {
 				serverSocket.close();
 			} catch ( IOException e ) {
-				System.out.println( "The socket could not be closed." );
+				printer.accept( "The socket could not be closed." );
 			}
 		}
 	}
