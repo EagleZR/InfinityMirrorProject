@@ -1,3 +1,4 @@
+package eaglezr.infinitymirror.support;
 
 public class Enums {
 
