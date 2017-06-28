@@ -1,0 +1,21 @@
+E1: Connection not made
+	- IOException in SendMessageTask.call()
+
+E2: Command not sent
+	- If the response still is -1 after the socket has been closed
+
+E3: Received Incorrect Response: XX
+	- If the received response does not correspond to the sent command
+	
+E4: Communications Thread Failed
+	- If the thread crashes, this message is pushed
+	
+E5: Connection Rejected
+	- Connection rejected by server due to failure to meet security requirements
+	- Exception thrown by connectToServer()
+	- Error thrown by SendMessageTask.call()
+
+E6: Command Parsing Error
+	- Thrown in parseServerResponse()
+	- The command that was sent to the server is not recognized by the client
+

@@ -4,9 +4,10 @@ public enum ClientCommands {
 	LIGHTS(1), 
 	WHITE_MODE(2),
 	SOLID_COLOR_MODE(3),
-	DESKTOP_HARMONY_MODE(4),
-	SOUND_RESPONSIVE_MODE(5),
-	MUSIC_RESPONSIVE_MODE(6);
+	ALTERNATING_COLOR_MODE(4),
+	RAINBOW_MODE(5), // Un-moving, multi-colored
+	RAINBOW_PULSE_MODE(6), // Multi-colored pulse mode
+	PULSE_MODE(7); // 2-tone pulse mode, moving
 
 	public final int COMMAND;
 

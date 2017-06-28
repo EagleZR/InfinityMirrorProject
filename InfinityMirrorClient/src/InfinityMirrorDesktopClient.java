@@ -2,6 +2,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.security.AccessControlException;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -50,15 +51,11 @@ public class InfinityMirrorDesktopClient extends Application {
 	private Color primaryColor = Color.BLUE; // Might want another to
 	private Color secondaryColor = Color.RED;
 
-	private Pane animationPane;
-
 	private Panes panes;
 
 	EventHandler<ActionEvent> displayMainMenu;
 	EventHandler<ActionEvent> toggleLights;
 	EventHandler<ActionEvent> toggleWhiteLight;
-
-	MessagingService messenger = new MessagingService();
 
 	private class Panes {
 
@@ -71,25 +68,28 @@ public class InfinityMirrorDesktopClient extends Application {
 		 */
 		Rectangle[] lights = new Rectangle[180];
 		Color[] colors = new Color[180];
+		
+		
 
 		public Pane mainPane;
 		public Pane solidColorModePane;
-		public Pane desktopHarmonyModePane;
-		public Pane soundResponsiveModePane;
-		public Pane musicResponsiveModePane;
+		public Pane alternatingColorModePane;
+		public Pane rainbowModePane;
+		public Pane rainbowPulseModePane;
+		public Pane pulseModePane;
 		public Pane infinityMirrorPane;
 
 		public Panes() {
-
 			for (int i = 0; i < lights.length; i++) {
 				lights[i] = new Rectangle();
 			}
 
 			this.mainPane = buildMainMenuPane();
 			this.solidColorModePane = buildSolidColorModePane();
-			this.desktopHarmonyModePane = buildDesktopHarmonyModePane();
-			this.soundResponsiveModePane = buildSoundResponsiveModePane();
-			this.musicResponsiveModePane = buildMusicResponsiveModePane();
+			this.alternatingColorModePane = buildAlternatingColorModePane();
+			this.rainbowModePane = buildRainbowModePane();
+			this.rainbowPulseModePane = buildRainbowPulseModePane();
+			this.pulseModePane = buildPulseModePane();
 			this.infinityMirrorPane = buildInfinityMirrorPane();
 		}
 
@@ -101,33 +101,39 @@ public class InfinityMirrorDesktopClient extends Application {
 			Button solidColorModeButton = new Button("Solid Color Mode");
 			solidColorModeButton.setOnAction(event -> displayPane(panes.solidColorModePane));
 
-			Button desktopHarmonyModeButton = new Button("Desktop Visual \nHarmony Mode");
-			desktopHarmonyModeButton.setOnAction(event -> displayPane(panes.desktopHarmonyModePane));
+			Button alternatingColorModeButton = new Button("Alternating Color Mode");
+			alternatingColorModeButton.setOnAction(event -> displayPane(panes.alternatingColorModePane));
 
-			Button soundResponsiveModeButton = new Button("Sound Responsive Mode");
-			soundResponsiveModeButton.setOnAction(event -> displayPane(panes.soundResponsiveModePane));
+			Button rainbowModeButton = new Button("Rainbow Mode");
+			rainbowModeButton.setOnAction(event -> displayPane(panes.rainbowModePane));
 
-			Button musicResponsiveModeButton = new Button("Music Responsive Mode");
-			musicResponsiveModeButton.setOnAction(event -> displayPane(panes.musicResponsiveModePane));
+			Button rainbowPulseModeButton = new Button("Rainbow Pulse Mode");
+			rainbowPulseModeButton.setOnAction(event -> displayPane(panes.rainbowPulseModePane));
+			
+			Button pulseModeButton = new Button(" Pulse Mode");
+			pulseModeButton.setOnAction(event -> displayPane(panes.pulseModePane));
 
 			// Add modal control buttons to modal control pane
 			GridPane modalControlPane = new GridPane();
 
 			modalControlPane.add(solidColorModeButton, 0, 0);
 			solidColorModeButton.prefWidthProperty().bind(modalControlPane.widthProperty().divide(2.0));
-			desktopHarmonyModeButton.prefHeightProperty().bind(modalControlPane.heightProperty().divide(2.0));
-
-			modalControlPane.add(desktopHarmonyModeButton, 1, 0);
-			desktopHarmonyModeButton.prefWidthProperty().bind(modalControlPane.widthProperty().divide(2.0));
 			solidColorModeButton.prefHeightProperty().bind(modalControlPane.heightProperty().divide(2.0));
 
-			modalControlPane.add(soundResponsiveModeButton, 0, 1);
-			soundResponsiveModeButton.prefWidthProperty().bind(modalControlPane.widthProperty().divide(2.0));
-			soundResponsiveModeButton.prefHeightProperty().bind(modalControlPane.heightProperty().divide(2.0));
+			modalControlPane.add(alternatingColorModeButton, 1, 0);
+			alternatingColorModeButton.prefWidthProperty().bind(modalControlPane.widthProperty().divide(2.0));
+			alternatingColorModeButton.prefHeightProperty().bind(modalControlPane.heightProperty().divide(2.0));
 
-			modalControlPane.add(musicResponsiveModeButton, 1, 1);
-			musicResponsiveModeButton.prefWidthProperty().bind(modalControlPane.widthProperty().divide(2.0));
-			musicResponsiveModeButton.prefHeightProperty().bind(modalControlPane.heightProperty().divide(2.0));
+			modalControlPane.add(rainbowModeButton, 0, 1);
+			rainbowModeButton.prefWidthProperty().bind(modalControlPane.widthProperty().divide(2.0));
+			rainbowModeButton.prefHeightProperty().bind(modalControlPane.heightProperty().divide(2.0));
+
+			modalControlPane.add(rainbowPulseModeButton, 1, 1);
+			rainbowPulseModeButton.prefWidthProperty().bind(modalControlPane.widthProperty().divide(2.0));
+			rainbowPulseModeButton.prefHeightProperty().bind(modalControlPane.heightProperty().divide(2.0));
+			
+			// TODO Add Pulse Mode button
+			// TODO Create ButtonPane extends Pane ?
 
 			// Create primary control buttons
 			whiteLightModeButton = new Button("Toggle White Light");
@@ -171,29 +177,35 @@ public class InfinityMirrorDesktopClient extends Application {
 			contentPane.setTop(colorPicker);
 			Button startSolidColorModeButton = new Button("Start Solid Color Mode");
 			startSolidColorModeButton.setOnAction(event -> {
-				messenger.setCommand(3);
-				Task task = messenger.createTask();
-				task.run();
-			}
-			/* new SendMessageThread(3).start() */
-			/* sendCommand(3) */);
+				sendMessage(ClientCommands.SOLID_COLOR_MODE.COMMAND);
+				// TODO Find out how to transmit colors
+			});
 			contentPane.setBottom(startSolidColorModeButton);
 			return buildSubMenuPane(contentPane);
 		}
 
-		private Pane buildDesktopHarmonyModePane() {
+		private Pane buildAlternatingColorModePane() {
 			Pane contentPane = new Pane();
-			return buildSubMenuPane(contentPane); // TODO
+			// TODO Build Alternating Color Control Pane
+			return buildSubMenuPane(contentPane); 
 		}
 
-		private Pane buildSoundResponsiveModePane() {
+		private Pane buildRainbowModePane() {
 			Pane contentPane = new Pane();
-			return buildSubMenuPane(contentPane); // TODO
+			// TODO Build Rainbow Mode Control Pane
+			return buildSubMenuPane(contentPane);
 		}
 
-		private Pane buildMusicResponsiveModePane() {
+		private Pane buildRainbowPulseModePane() {
 			Pane contentPane = new Pane();
-			return buildSubMenuPane(contentPane); // TODO
+			// TODO Build Rainbow Mode Control Pane
+			return buildSubMenuPane(contentPane); 
+		}
+		
+		private Pane buildPulseModePane() {
+			Pane contentPane = new Pane();
+			// TODO Build Pulse Mode Control Pane
+			return buildSubMenuPane(contentPane); 
 		}
 
 		private Pane buildInfinityMirrorPane() {
@@ -203,7 +215,7 @@ public class InfinityMirrorDesktopClient extends Application {
 			pane.setCenter(imageView);
 			EventHandler<ActionEvent> eventHandler = e -> {
 				offsetColor();
-				// colorLights(paneType);
+				// TODO colorLights(paneType);
 			};
 
 			Timeline changingLights = new Timeline(new KeyFrame(Duration.millis(250), eventHandler));
@@ -234,37 +246,14 @@ public class InfinityMirrorDesktopClient extends Application {
 		displayMainMenu = event -> displayPane(panes.mainPane);
 
 		toggleLights = event -> {
-			SendMessageTask sendMessage = new SendMessageTask();
-			sendMessage.command = 1;
-			int response = -1;
-			try {
-				response = sendMessage.call();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (response == -1) {
-				displayError("E2: Command not sent");
-			} else if (response / 10 != 1) {
-				displayError("E3: Received Incorrect Response: " + response);
-			} else if (response % 10 == 0) { // Lights are now off
-				lightsOn = false;
-				menuTurnOnLights.setVisible(true);
-				menuTurnOffLights.setVisible(false);
-				onOffButton.setText("Turn On Lights");
-			} else if (response % 10 == 1) { // Lights are now on
-				lightsOn = true;
-				menuTurnOnLights.setVisible(false);
-				menuTurnOffLights.setVisible(true);
-				onOffButton.setText("Turn Off Lights");
-			}
+			sendMessage(ClientCommands.LIGHTS.COMMAND);
 		};
 
 		toggleWhiteLight = event -> {
-			// TODO
+			sendMessage(ClientCommands.WHITE_MODE.COMMAND);
 		};
-
-		messenger.start();
+		
+		// TODO Create the other button events
 
 		this.primaryStage = stage;
 		this.panes = new Panes();
@@ -337,66 +326,122 @@ public class InfinityMirrorDesktopClient extends Application {
 //		return response;
 //	}
 
-	private class MessagingService extends Service<Integer> {
-
-		private int command;
-
-		public int getCommand() {
-			return this.command;
+//	private class MessagingService extends Service<Integer> {
+//
+//		private int command;
+//
+//		public int getCommand() {
+//			return this.command;
+//		}
+//
+//		public void setCommand(int value) {
+//			this.command = value;
+//		}
+//
+//		@Override
+//		protected Task<Integer> createTask() {
+//			return new Task<Integer>() {
+//
+//				@Override
+//				protected Integer call() throws Exception {
+//					outputLabel.setText("Sending Command: " + command);
+//					int response = -1;
+//					try { // Any
+//						Socket socket = new Socket(url, port);
+//						DataInputStream in = new DataInputStream(socket.getInputStream());
+//						DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+//						out.write(command);
+//						response = in.read();
+//						socket.close();
+//					} catch (IOException e) {
+//						displayError("E1: Connection not made");
+//					}
+//					return response;
+//				}
+//
+//			};
+//		}
+//
+//	}
+	
+	private void sendMessage(int command) {
+		try {
+			SendMessageTask sendMessage = new SendMessageTask(command);
+			Thread thread = new Thread(sendMessage);
+			
+			thread.setDaemon(false);
+			thread.start();
+		} catch (Exception e) {
+			displayError("E1: Connection not made");
 		}
-
-		public void setCommand(int value) {
-			this.command = value;
-		}
-
-		@Override
-		protected Task<Integer> createTask() {
-			return new Task<Integer>() {
-
-				@Override
-				protected Integer call() throws Exception {
-					outputLabel.setText("Sending Command: " + command);
-					int response = -1;
-					try { // Any
-						Socket socket = new Socket(url, port);
-						DataInputStream in = new DataInputStream(socket.getInputStream());
-						DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-						out.write(command);
-						response = in.read();
-						socket.close();
-					} catch (IOException e) {
-						displayError("E1: Connection not made");
-					}
-					return response;
-				}
-
-			};
-		}
-
 	}
 
-	private class SendMessageTask extends Task<Integer> {
+	private class SendMessageTask extends Task {
 
-		public int command;
+		private int command;
+		private int response;
+		
+		public SendMessageTask(int command) {
+			this.command = command;
+		}
 
 		@Override
-		protected Integer call() throws Exception {
-			outputLabel.setText("Sending Command: " + command);
-			int response = -1;
+		protected Object call() throws Exception {
+			response = -1;
 			try { // Any
 				Socket socket = new Socket(url, port);
 				DataInputStream in = new DataInputStream(socket.getInputStream());
 				DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+				connectToServer();
 				out.write(command);
 				response = in.read();
 				socket.close();
 			} catch (IOException e) {
 				displayError("E1: Connection not made");
+			} catch (AccessControlException e) {
+				displayError("E5: Connection Rejected");
 			}
-			outputLabel.setText("Received: " + response);
-			return response;
+			return response; // TODO Determine if possible to avoid returning anything
 		}
 
+		@Override
+		protected void succeeded() {
+			super.succeeded();
+			parseServerResponse(command, response);
+		}
+		
+		@Override
+		protected void failed() {
+			super.failed();
+			displayError("E4: Communications Thread Failed");
+		}
+	}
+	
+	private void parseServerResponse(int command, int response) {
+		if (command == ClientCommands.LIGHTS.COMMAND) {
+			if (response == -1) {
+				displayError("E2: Command not sent");
+			} else if (response / 10 != 1) {
+				displayError("E3: Received Incorrect Response: " + response);
+			} else if (response % 10 == 0) { // Lights are now off
+				lightsOn = false;
+				menuTurnOnLights.setVisible(true);
+				menuTurnOffLights.setVisible(false);
+				onOffButton.setText("Turn On Lights");
+			} else if (response % 10 == 1) { // Lights are now on
+				lightsOn = true;
+				menuTurnOnLights.setVisible(false);
+				menuTurnOffLights.setVisible(true);
+				onOffButton.setText("Turn Off Lights");
+			}
+		} // TODO respond to other commands
+		else {
+			displayError ("E6: Command Parsing Error");
+		}
+	}
+	
+	private void connectToServer() throws AccessControlException {
+		
 	}
 
 	/*
