@@ -5,6 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public abstract class SubMenuPane extends IMPane {
@@ -15,11 +16,15 @@ public abstract class SubMenuPane extends IMPane {
 	
 	protected SubMenuPane(ClientController controller) {
 		super(controller);
+		
+		// Initialize GUI
 		Button backButton = new Button("<-- Back");
-		backButton.setOnAction(super.displayMainMenu);
+//		backButton.setOnAction(super.displayMainMenu);
 		BorderPane subMenuPane = new BorderPane();
 		subMenuPane.setTop(backButton);
 		subMenuPane.setCenter(subMenuContainer);
 		super.container = subMenuPane;
 	}
+	
+	
 }
