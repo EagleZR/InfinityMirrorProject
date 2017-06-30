@@ -1,14 +1,10 @@
-
 package eaglezr.infinitymirror.client.panes;
 
-import eaglezr.infinitymirror.client.ClientController;
-import eaglezr.infinitymirror.support.ClientCommands;
+import eaglezr.infinitymirror.support.ErrorManagementSystem;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -19,32 +15,36 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
-abstract class IMPane extends Pane {
+public class IMPane extends Pane {
 	
 	/**
 	 * Add all content to be displayed in here.
 	 */
-	protected Pane container = new Pane();
-	public Label outputLabel = new Label( "" );
+	public Label outputLabel;
 	public MyMenuBar menu;
 	
-	protected IMPane( ClientController controller ) {
+	BorderPane innerPane;
+	
+	protected IMPane( ErrorManagementSystem ems ) {
+		outputLabel = ems.getLabel();
 		
 		// Initialize GUI
 		BorderPane shell = buildPaneShell();
 		this.getChildren().add( shell );
 	}
 	
+	public void updateContainer(Pane pane) {
+		innerPane.setCenter( pane );
+	}
+	
 	private BorderPane buildPaneShell() {
 		// Build Application Pane
 		BorderPane mainPane = new BorderPane();
 		mainPane.setTop( this.menu = new MyMenuBar() );
-		BorderPane innerPane = new BorderPane();
+		innerPane = new BorderPane();
 		innerPane.setTop( buildInfinityMirrorPane() );
-		innerPane.setCenter( this.container );
 		mainPane.setCenter( innerPane );
 		mainPane.setBottom( outputLabel );
 		return mainPane;
@@ -66,47 +66,47 @@ abstract class IMPane extends Pane {
 		}
 		
 		BorderPane pane = new BorderPane();
-		Image image = new Image( "MirrorBase.png" );
+		Image image = new Image( "file:eaglezr\\infinitymirror\\resources\\images\\MirrorBase.png", true );
 		ImageView imageView = new ImageView( image );
 		pane.setCenter( imageView );
-		EventHandler<ActionEvent> eventHandler = e -> {
-			// offsetColor();
-			// TODO colorLights(paneType);
-		};
-		
-		Timeline changingLights = new Timeline( new KeyFrame( Duration.millis( 250 ), eventHandler ) );
+//		EventHandler<ActionEvent> eventHandler = e -> {
+//			// offsetColor();
+//			// TODO colorLights(paneType);
+//		};
+//		
+//		Timeline changingLights = new Timeline( new KeyFrame( Duration.millis( 250 ), eventHandler ) );
 		
 		return pane;
 	}
 	
-	private class MyMenuBar extends MenuBar {
+	protected class MyMenuBar extends MenuBar {
 		
 		public MenuItem returnToMain;
-		public MenuItem menuWhiteLightMode;
-		public MenuItem menuTurnOnLights;
-		public MenuItem menuTurnOffLights;
-		public MenuItem menuExit;
+		public MenuItem whiteLightMode;
+		public MenuItem turnOnLights;
+		public MenuItem turnOffLights;
+		public MenuItem exit;
 		
-		public MyMenuBar() {
+		protected MyMenuBar() {
 			// Create Menus
 			Menu fileMenu = new Menu( "File" );
 			
 			returnToMain = new MenuItem( "Main Menu" );
 			// returnToMain.setOnAction(this.displayMainMenu);
 			
-			menuWhiteLightMode = new MenuItem( "Toggle White Light" );
+			whiteLightMode = new MenuItem( "Toggle White Light" );
 			// menuWhiteLightMode.setOnAction(toggleWhiteLight);
 			
-			menuTurnOnLights = new MenuItem( "Turn on lights" );
+			turnOnLights = new MenuItem( "Turn on lights" );
 			// menuTurnOnLights.setOnAction(toggleLights);
-			menuTurnOnLights.setVisible( false );
+			turnOnLights.setVisible( false );
 			
-			menuTurnOffLights = new MenuItem( "Turn off lights" );
+			turnOffLights = new MenuItem( "Turn off lights" );
 			// menuTurnOffLights.setOnAction(toggleLights);
 			
-			menuExit = new MenuItem( "Exit" );
-			fileMenu.getItems().addAll( returnToMain, menuWhiteLightMode, menuTurnOnLights, menuTurnOffLights,
-					menuExit );
+			exit = new MenuItem( "Exit" );
+			fileMenu.getItems().addAll( returnToMain, whiteLightMode, turnOnLights, turnOffLights,
+					exit );
 			
 			Menu optionsMenu = new Menu( "Options" );
 			// TODO Add Options Menu components
@@ -117,6 +117,15 @@ abstract class IMPane extends Pane {
 			// Create Menu Bar
 			this.getMenus().addAll( fileMenu, optionsMenu, helpMenu );
 		}
+		
+	}
+	
+	public void toggleLights( boolean isOn ) {
+		menu.turnOnLights.setVisible( isOn );
+		menu.turnOffLights.setVisible( isOn );
+	}
+	
+	public void toggleWhiteLight( boolean isWhite ) {
 		
 	}
 	

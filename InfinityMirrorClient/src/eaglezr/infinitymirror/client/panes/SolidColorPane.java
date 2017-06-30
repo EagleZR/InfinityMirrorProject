@@ -1,17 +1,20 @@
 package eaglezr.infinitymirror.client.panes;
 
 import eaglezr.infinitymirror.client.ClientController;
+import eaglezr.infinitymirror.support.ErrorManagementSystem;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
-public class SolidColorPane extends SubMenuPane {
+public class SolidColorPane extends Pane {
 	
 	public ColorPicker colorPicker;
+	public Color primaryColor;
 	public Button startSolidColorModeButton;
 
-	public SolidColorPane(ClientController controller) {
-		super(controller);
+	public SolidColorPane(ErrorManagementSystem ems) {
 		BorderPane contentPane = new BorderPane();
 		colorPicker = new ColorPicker();
 		colorPicker.setOnAction(event -> primaryColor = colorPicker.getValue());
@@ -22,6 +25,6 @@ public class SolidColorPane extends SubMenuPane {
 //			// TODO Find out how to transmit colors
 //		});
 		contentPane.setBottom(startSolidColorModeButton);
-		super.subMenuContainer.getChildren().add( contentPane );
+		super.getChildren().add( contentPane );
 	}
 }

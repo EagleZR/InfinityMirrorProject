@@ -26,6 +26,8 @@ public class ErrorManagementSystem implements Closeable {
 	public static enum Printers {LOG_PRINTER, CONSOLE_PRINTER, LABEL_PRINTER};
 	public static enum UserTypes {CLIENT, SERVER, APP};
 	
+	private Label outputLabel;
+	
 	private UserTypes currType;
 	
 	Consumer<String> printer;
@@ -52,6 +54,7 @@ public class ErrorManagementSystem implements Closeable {
 	 */
 	public ErrorManagementSystem(UserTypes userType, Label label, Printers defaultPrinter) {
 		this (userType, defaultPrinter);
+		this.outputLabel = label;
 		this.labelPrinter = generateLabelPrinter(label);
 	}
 
@@ -187,6 +190,11 @@ public class ErrorManagementSystem implements Closeable {
 		errorPopup.initStyle(StageStyle.UTILITY);
 		errorPopup.resizableProperty().setValue(false);
 		errorPopup.show();
+	}
+	
+	
+	public Label getLabel() {
+		return this.outputLabel;
 	}
 	
 	/**

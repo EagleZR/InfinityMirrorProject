@@ -1,11 +1,11 @@
 package eaglezr.infinitymirror.client.panes;
 
-import eaglezr.infinitymirror.client.ClientController;
-import javafx.stage.Stage;
+import eaglezr.infinitymirror.support.ErrorManagementSystem;
+import javafx.scene.layout.Pane;
 
-public class RainbowPane extends SubMenuPane {
+public class RainbowPane extends Pane {
 
-	public RainbowPane(ClientController controller) {
-		super(controller);
+	public RainbowPane(ErrorManagementSystem ems) {
+		
 	}
 }
