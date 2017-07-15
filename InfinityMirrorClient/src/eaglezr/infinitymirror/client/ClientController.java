@@ -42,39 +42,6 @@ public class ClientController {
 		
 	}
 	
-	public class ListenerService extends Service {
-		
-		@Override
-		protected Task createTask() {
-			// TODO Create a task?
-			return null;
-		}
-		
-		@SuppressWarnings( "rawtypes" )
-		public class ServerListenerTask extends Task {
-			
-			@Override
-			protected Object call() throws Exception {
-				// FIXME Listen for a signal from the server
-				
-				return null;
-			}
-			
-			/**
-			 * Update data from here
-			 */
-			protected void succeeded() {
-				super.succeeded();
-				// TODO Update according to server response
-			}
-			
-			protected void failed() {
-				super.failed();
-				outputLabel.setText( "Could not update from the server" );
-			}
-		}
-	}
-	
 	public void updatePanes() {
 		
 	}
