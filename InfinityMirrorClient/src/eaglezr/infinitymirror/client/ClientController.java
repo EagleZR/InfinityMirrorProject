@@ -29,6 +29,8 @@ public class ClientController {
 	public void displayPane( Pane currentPane ) {
 		// Display the scene
 		Scene scene = new Scene( currentPane, 300, 400 );
+		currentPane.prefHeightProperty().bind( scene.heightProperty() );
+		System.out.println( currentPane.getHeight() );
 		this.primaryStage.setScene( scene );
 		this.primaryStage.setTitle( "Infinity Mirror Client" );
 		this.primaryStage.resizableProperty().setValue( false );
