@@ -21,6 +21,7 @@ public class InfinityMirrorDesktopClient extends Application {
 	
 	@Override
 	public void start( Stage stage ) throws Exception {
+		
 		this.controller = new ClientController( stage );
 	}
 

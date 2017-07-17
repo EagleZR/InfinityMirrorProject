@@ -13,15 +13,16 @@ import javafx.stage.Stage;
 public class ClientController {
 	
 	Label outputLabel = new Label( "" );
-	ErrorManagementSystem.Printers defaultPrinter = ErrorManagementSystem.Printers.CONSOLE_PRINTER;
-	ErrorManagementSystem ems = new ErrorManagementSystem( ErrorManagementSystem.UserTypes.CLIENT, outputLabel,
-			defaultPrinter );
+	LoggingTool log = LoggingTool.startLogger( LoggingTool.UserTypes.CLIENT, outputLabel,
+			LoggingTool.Printers.LABEL_PRINTER );
+	ErrorManagementSystem ems;
 	PanesController panes;
 	Stage primaryStage;
 	
 	public ClientController( Stage stage ) {
 		this.primaryStage = stage;
-		this.panes = new PanesController( this, ems );
+		ems = new ErrorManagementSystem (stage);
+		this.panes = new PanesController( this, log, ems );
 		displayPane(panes.getPane());
 	}
 	
@@ -32,10 +33,6 @@ public class ClientController {
 		this.primaryStage.setTitle( "Infinity Mirror Client" );
 		this.primaryStage.resizableProperty().setValue( false );
 		this.primaryStage.show();
-	}
-	
-	public boolean getLightsOn() {
-		return true; // FIXME Program comms with the server
 	}
 	
 	public void sendMessage( int message ) {

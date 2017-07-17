@@ -6,20 +6,21 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.security.AccessControlException;
+import eaglezr.infinitymirror.support.Error;
 import eaglezr.infinitymirror.support.ErrorManagementSystem;
+import eaglezr.infinitymirror.support.LoggingTool;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 public class ClientCommunicator extends Communicator {
 	
 	private static ListenerService listener;
+	private LoggingTool log;
 	private ErrorManagementSystem ems;
-	
-	public boolean responseReady;
-	
-	// FIXME Make Constructor
-	public ClientCommunicator( String url, int port, ErrorManagementSystem ems ) {
+		
+	public ClientCommunicator( String url, int port, LoggingTool log, ErrorManagementSystem ems ) {
 		super( url, port );
+		this.log = log;
 		this.ems = ems;
 		if ( listener == null ) {
 			listener = new ListenerService();
@@ -34,18 +35,17 @@ public class ClientCommunicator extends Communicator {
 			thread.setDaemon( false );
 			thread.start();
 		} catch ( Exception e ) {
-			ems.print( "Connection not made." );
+			log.print( Error.COMMAND_NOT_SENT.toString() ); 
 		}
 	}
 	
-	// How do I want to do this?
-	// Create IM object and update everything from that?
-	private Byte[] getCache() {
-		
-		return null;
-	}
+//	// How do I want to do this?
+//	// Create IM object and update everything from that?
+//	private Byte[] getCache() {
+//		
+//		return null;
+//	}
 	
-	// FIXME Move the Task back to the client ?
 	private class SendMessageTask extends Task {
 		
 		private int command;
@@ -156,7 +156,7 @@ public class ClientCommunicator extends Communicator {
 			// Main thread
 			protected void failed() {
 				super.failed();
-				ems.print( "Could not update from the server" );
+				log.print( "Could not update from the server" );
 			}
 		}
 	}
