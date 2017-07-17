@@ -4,50 +4,52 @@ package eaglezr.infinitymirror.client.panes;
 import eaglezr.infinitymirror.client.ClientController;
 import eaglezr.infinitymirror.support.ClientCommands;
 import eaglezr.infinitymirror.support.ErrorManagementSystem;
+import eaglezr.infinitymirror.support.LoggingTool;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.Pane;
 
 public class PanesController {
 	
-	ClientController controller;
+	private ClientController controller;
 	
-	IMPane shellPane;
-	MainMenuPane mainMenu;
-	SubMenuPane subMenuWrapper;
-	SolidColorPane solidColor;
-	AlternatingColorPane alternateColor;
-	RainbowPane rainbow;
-	RainbowPulsePane rainbowPulse;
-	PulsePane pulse;
+	private IMPane shellPane;
+	private MainMenuPane mainMenu;
+	private SubMenuPane subMenuWrapper;
+	private SolidColorPane solidColor;
+	private AlternatingColorPane alternateColor;
+	private RainbowPane rainbow;
+	private RainbowPulsePane rainbowPulse;
+	private PulsePane pulse;
 	
 	// Functional events
-	protected EventHandler<ActionEvent> toggleLights;
-	protected EventHandler<ActionEvent> toggleWhiteLight;
+	private EventHandler<ActionEvent> toggleLights;
+	private EventHandler<ActionEvent> toggleWhiteLight;
 	
 	// Navigation events
-	protected EventHandler<ActionEvent> displayMainMenu;
-	protected EventHandler<ActionEvent> displaySolidColorPane;
-	protected EventHandler<ActionEvent> displayAlternatingColorPane;
-	protected EventHandler<ActionEvent> displayRainbowPane;
-	protected EventHandler<ActionEvent> displayRainbowPulsePane;
-	protected EventHandler<ActionEvent> displayPulsePane;
+	private EventHandler<ActionEvent> displayMainMenu;
+	private EventHandler<ActionEvent> displaySolidColorPane;
+	private EventHandler<ActionEvent> displayAlternatingColorPane;
+	private EventHandler<ActionEvent> displayRainbowPane;
+	private EventHandler<ActionEvent> displayRainbowPulsePane;
+	private EventHandler<ActionEvent> displayPulsePane;
 	
-	public Pane currPane;
+	private Pane currPane;
 	
-	public PanesController( ClientController controller, ErrorManagementSystem ems ) {
+	public PanesController( ClientController controller, LoggingTool log, ErrorManagementSystem ems ) {
+		this.controller = controller;
 		
-		this.shellPane = new IMPane( ems );
+		this.shellPane = new IMPane( log, ems );
 		
-		this.mainMenu = new MainMenuPane( ems );
+		this.mainMenu = new MainMenuPane( log, ems );
 		
-		this.subMenuWrapper = new SubMenuPane( ems );
+		this.subMenuWrapper = new SubMenuPane( log, ems );
 		
-		this.solidColor = new SolidColorPane( ems );
-		this.alternateColor = new AlternatingColorPane( ems );
-		this.rainbow = new RainbowPane( ems );
-		this.rainbowPulse = new RainbowPulsePane( ems );
-		this.pulse = new PulsePane( ems );
+		this.solidColor = new SolidColorPane( log, ems );
+		this.alternateColor = new AlternatingColorPane( log, ems );
+		this.rainbow = new RainbowPane( log, ems );
+		this.rainbowPulse = new RainbowPulsePane( log, ems );
+		this.pulse = new PulsePane( log, ems );
 		
 		this.currPane = this.mainMenu;
 		
@@ -61,6 +63,8 @@ public class PanesController {
 	public Pane getPane() {
 		if ( this.currPane == this.mainMenu ) {
 			this.shellPane.updateContainer( currPane );
+			currPane.prefWidthProperty().bind( shellPane.widthProperty() );
+			currPane.prefHeightProperty().bind( shellPane.heightProperty() );
 		} else {
 			this.shellPane.updateContainer( this.subMenuWrapper );
 			this.subMenuWrapper.updateContainer( this.currPane );
@@ -117,7 +121,7 @@ public class PanesController {
 	
 	private void addEventHandlers() {
 		// Shell navigation
-		this.shellPane.menu.returnToMain.setOnAction( this.displayMainMenu );
+		this.shellPane.menu.goToMain.setOnAction( this.displayMainMenu );
 		
 		// Shell functionality
 		this.shellPane.menu.turnOnLights.setOnAction( this.toggleLights );
