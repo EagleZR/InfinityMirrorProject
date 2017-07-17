@@ -1,6 +1,7 @@
 package eaglezr.infinitymirror.client.panes;
 
 import eaglezr.infinitymirror.support.ErrorManagementSystem;
+import eaglezr.infinitymirror.support.LoggingTool;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
@@ -22,20 +23,20 @@ public class IMPane extends Pane {
 	/**
 	 * Add all content to be displayed in here.
 	 */
-	public Label outputLabel;
-	public MyMenuBar menu;
+	protected Label outputLabel;
+	protected MyMenuBar menu;
 	
-	BorderPane innerPane;
+	protected BorderPane innerPane;
 	
-	protected IMPane( ErrorManagementSystem ems ) {
-		outputLabel = ems.getLabel();
+	protected IMPane( LoggingTool log, ErrorManagementSystem ems ) {
+		outputLabel = log.getLabel();
 		
 		// Initialize GUI
 		BorderPane shell = buildPaneShell();
 		this.getChildren().add( shell );
 	}
 	
-	public void updateContainer(Pane pane) {
+	protected void updateContainer(Pane pane) {
 		innerPane.setCenter( pane );
 	}
 	
@@ -81,51 +82,64 @@ public class IMPane extends Pane {
 	
 	protected class MyMenuBar extends MenuBar {
 		
-		public MenuItem returnToMain;
-		public MenuItem whiteLightMode;
-		public MenuItem turnOnLights;
-		public MenuItem turnOffLights;
-		public MenuItem exit;
+		protected MenuItem whiteLightMode;
+		protected MenuItem turnOnLights;
+		protected MenuItem turnOffLights;
+		protected MenuItem exit;
+		
+		protected MenuItem goToMain;
+		protected MenuItem goToAltColor;
 		
 		protected MyMenuBar() {
-			// Create Menus
+			// File
 			Menu fileMenu = new Menu( "File" );
 			
-			returnToMain = new MenuItem( "Main Menu" );
-			// returnToMain.setOnAction(this.displayMainMenu);
-			
 			whiteLightMode = new MenuItem( "Toggle White Light" );
-			// menuWhiteLightMode.setOnAction(toggleWhiteLight);
 			
 			turnOnLights = new MenuItem( "Turn on lights" );
-			// menuTurnOnLights.setOnAction(toggleLights);
 			turnOnLights.setVisible( false );
 			
 			turnOffLights = new MenuItem( "Turn off lights" );
-			// menuTurnOffLights.setOnAction(toggleLights);
 			
 			exit = new MenuItem( "Exit" );
-			fileMenu.getItems().addAll( returnToMain, whiteLightMode, turnOnLights, turnOffLights,
+			fileMenu.getItems().addAll( whiteLightMode, turnOnLights, turnOffLights,
 					exit );
 			
+			// View
+			Menu viewMenu = new Menu("View");
+			
+			goToMain = new MenuItem( "Main Menu" );
+			
+			Menu goToViewMenu = new Menu("Go To...");
+			
+			goToAltColor = new MenuItem( "Alternating Color" );
+			
+			goToViewMenu.getItems().addAll( goToMain, goToAltColor );
+			
+			viewMenu.getItems().addAll( goToViewMenu, goToMain );
+			
+			// TODO Add other MenuItems to the View tab
+			
+			// Options
 			Menu optionsMenu = new Menu( "Options" );
 			// TODO Add Options Menu components
 			
+			// Help
 			Menu helpMenu = new Menu( "Help" );
 			// TODO Add Help Menu components
 			
 			// Create Menu Bar
-			this.getMenus().addAll( fileMenu, optionsMenu, helpMenu );
+			this.getMenus().addAll( fileMenu, viewMenu, optionsMenu, helpMenu );
 		}
 		
 	}
 	
-	public void toggleLights( boolean isOn ) {
+	protected void toggleLights( boolean isOn ) {
 		menu.turnOnLights.setVisible( isOn );
 		menu.turnOffLights.setVisible( isOn );
 	}
 	
-	public void toggleWhiteLight( boolean isWhite ) {
+	protected void toggleWhiteLight( boolean isWhite ) {
 		
 	}
 	
