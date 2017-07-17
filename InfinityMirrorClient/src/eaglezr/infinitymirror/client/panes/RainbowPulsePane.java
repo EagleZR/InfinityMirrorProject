@@ -1,11 +1,12 @@
 package eaglezr.infinitymirror.client.panes;
 
 import eaglezr.infinitymirror.support.ErrorManagementSystem;
+import eaglezr.infinitymirror.support.LoggingTool;
 import javafx.scene.layout.Pane;
 
 public class RainbowPulsePane extends Pane {
 
-	public RainbowPulsePane(ErrorManagementSystem ems) {
+	protected RainbowPulsePane( LoggingTool log, ErrorManagementSystem ems ) {
 		
 	}
 }
