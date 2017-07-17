@@ -3,9 +3,9 @@ package eaglezr.infinitymirror.support;
 
 import javafx.scene.paint.Color;
 
-public  class InfinityMirror {
+public final class InfinityMirror {
 	
-	public enum Modes {
+	public static enum Modes {
 		LIGHTS( 1 ), WHITE_MODE( 2 ), SOLID_COLOR_MODE( 3 ), ALTERNATING_COLOR_MODE( 4 ), RAINBOW_MODE( 5 ), // Un-moving,
 																												// multi-colored
 		RAINBOW_PULSE_MODE( 6 ), // Multi-colored pulse mode
@@ -18,35 +18,34 @@ public  class InfinityMirror {
 		}
 	}
 	
-	private Modes currMode;
-	private Color primaryColor;
-	private Color secondaryColor;
-	private Color[] lights = new Color[180];
+	private final Modes currMode;
+	private final Color primaryColor;
+	private final Color secondaryColor;
+	private final Color[] lights = new Color[180];
 	
 	public InfinityMirror( Modes mode ) {
 		this.currMode = mode;
+		this.primaryColor = null;
+		this.secondaryColor = null;
+		setLights( this.lights, this.currMode );
 	}
 	
 	public InfinityMirror( Modes mode, Color primaryColor ) {
-		this( mode );
+		this.currMode = mode;
 		this.primaryColor = primaryColor;
+		this.secondaryColor = null;
+		setLights( this.lights, this.currMode );
 	}
 	
 	public InfinityMirror( Modes mode, Color primaryColor, Color secondaryColor ) {
-		this( mode, primaryColor );
+		this.currMode = mode;
+		this.primaryColor = primaryColor;
 		this.secondaryColor = secondaryColor;
+		setLights( this.lights, this.currMode );
 	}
 	
-	public synchronized void setWhiteLightMode() {
+	// TODO Figure out how best to set the lights
+	public static void setLights( Color[] lights, Modes mode ) {
 		
 	}
-	
-	public synchronized void setSolidColorMode( Color color ) {
-		
-	}
-	
-	public synchronized void setAlternatingColorMode( Color primaryColor, Color secondaryColor ) {
-		
-	}
-	
 }
