@@ -5,7 +5,7 @@ import eaglezr.infinitymirror.desktop.ClientController;
 import eaglezr.infinitymirror.support.ClientCommands;
 import eaglezr.infinitymirror.support.ErrorManagementSystem;
 import eaglezr.infinitymirror.support.InfinityMirror;
-import eaglezr.infinitymirror.support.LoggingTool;
+import eaglezr.infinitymirror.support.IMLoggingTool;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.Pane;
@@ -26,8 +26,10 @@ public class PanesController {
 	// Functional events
 	private EventHandler<ActionEvent> toggleLights;
 	private EventHandler<ActionEvent> toggleWhiteLight;
+	private EventHandler<ActionEvent> pushMirror;
 	
-	// TODO Is there a way to make these build themselves automatically based on the panes I build?
+	// TODO Is there a way to make these build themselves automatically based on
+	// the panes I build?
 	// Navigation events
 	private EventHandler<ActionEvent> displayMainMenu;
 	private EventHandler<ActionEvent> displaySolidColorPane;
@@ -43,20 +45,20 @@ public class PanesController {
 	
 	private Pane currPane;
 	
-	public PanesController( ClientController controller, LoggingTool log, ErrorManagementSystem ems ) {
+	public PanesController( ClientController controller, ErrorManagementSystem ems ) {
 		this.controller = controller;
 		
-		this.shellPane = new IMPane( log, ems );
+		this.shellPane = new IMPane( ems );
 		
-		this.mainMenu = new MainMenuPane( log, ems );
+		this.mainMenu = new MainMenuPane( ems );
 		
-		this.subMenuWrapper = new SubMenuPane( log, ems );
+		this.subMenuWrapper = new SubMenuPane( ems );
 		
-		this.solidColor = new SolidColorPane( log, ems );
-		this.alternateColor = new AlternatingColorPane( log, ems );
-		this.rainbow = new RainbowPane( log, ems );
-		this.rainbowPulse = new RainbowPulsePane( log, ems );
-		this.pulse = new PulsePane( log, ems );
+		this.solidColor = new SolidColorPane( ems );
+		this.alternateColor = new AlternatingColorPane( ems );
+		this.rainbow = new RainbowPane( ems );
+		this.rainbowPulse = new RainbowPulsePane( ems );
+		this.pulse = new PulsePane( ems );
 		
 		this.currPane = this.mainMenu;
 		
@@ -68,11 +70,17 @@ public class PanesController {
 	public Pane getPane() {
 		if ( this.currPane == this.mainMenu ) {
 			this.shellPane.updateContainer( currPane );
-			// currPane.prefWidthProperty().bind( shellPane.widthProperty() );
-			// currPane.prefHeightProperty().bind( shellPane.heightProperty() );
+			currPane.prefWidthProperty().bind( shellPane.widthProperty() );
+			currPane.prefHeightProperty().bind( shellPane.heightProperty() );
 		} else {
 			this.shellPane.updateContainer( this.subMenuWrapper );
 			this.subMenuWrapper.updateContainer( this.currPane );
+			
+			this.subMenuWrapper.prefWidthProperty().bind( shellPane.widthProperty() );
+			this.subMenuWrapper.prefHeightProperty().bind( shellPane.heightProperty() );
+			
+//			currPane.prefWidthProperty().bind( this.subMenuWrapper.widthProperty() );
+//			currPane.prefHeightProperty().bind( this.subMenuWrapper.heightProperty() );
 		}
 		return this.shellPane;
 	}
@@ -111,14 +119,20 @@ public class PanesController {
 		
 		// Functional events
 		this.toggleLights = event -> {
-			// TODO Find a way to store previous or something so toggling actually toggles 
-//			controller.pushMirror( new InfinityMirror(InfinityMirror.Modes.) );
-//			controller.sendMessage( ClientCommands.LIGHTS.COMMAND );
+			// TODO Find a way to store previous or something so toggling
+			// actually toggles
+			// controller.pushMirror( new InfinityMirror(InfinityMirror.Modes.)
+			// );
+			// controller.sendMessage( ClientCommands.LIGHTS.COMMAND );
 		};
 		
 		this.toggleWhiteLight = event -> {
 			
-//			controller.sendMessage( ClientCommands.WHITE_MODE.COMMAND );
+			// controller.sendMessage( ClientCommands.WHITE_MODE.COMMAND );
+		};
+		
+		this.pushMirror = event -> {
+			IMLoggingTool.getLogger().print( "Pushing " + this.currPane.getClass().getSimpleName() );
 		};
 		
 		// Control Events
@@ -162,6 +176,7 @@ public class PanesController {
 		this.subMenuWrapper.backButton.setOnAction( this.displayMainMenu );
 		
 		// Wrapper functionality
+		this.subMenuWrapper.pushButton.setOnAction( this.pushMirror );
 		
 		///////////////////
 		// Main Menu

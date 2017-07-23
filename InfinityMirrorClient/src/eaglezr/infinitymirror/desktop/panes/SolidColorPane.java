@@ -3,7 +3,7 @@ package eaglezr.infinitymirror.desktop.panes;
 
 import eaglezr.infinitymirror.desktop.ClientController;
 import eaglezr.infinitymirror.support.ErrorManagementSystem;
-import eaglezr.infinitymirror.support.LoggingTool;
+import eaglezr.infinitymirror.support.IMLoggingTool;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.layout.BorderPane;
@@ -16,7 +16,7 @@ public class SolidColorPane extends Pane {
 	protected Color primaryColor;
 	protected Button startSolidColorModeButton;
 	
-	protected SolidColorPane( LoggingTool log, ErrorManagementSystem ems ) {
+	protected SolidColorPane( ErrorManagementSystem ems ) {
 		BorderPane contentPane = new BorderPane();
 		colorPicker = new ColorPicker();
 		colorPicker.setOnAction( event -> primaryColor = colorPicker.getValue() );

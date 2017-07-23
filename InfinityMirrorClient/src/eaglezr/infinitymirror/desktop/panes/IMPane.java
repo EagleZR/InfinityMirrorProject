@@ -1,7 +1,8 @@
+
 package eaglezr.infinitymirror.desktop.panes;
 
 import eaglezr.infinitymirror.support.ErrorManagementSystem;
-import eaglezr.infinitymirror.support.LoggingTool;
+import eaglezr.infinitymirror.support.IMLoggingTool;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
@@ -31,12 +32,15 @@ public class IMPane extends BorderPane {
 	
 	private String mirrorAddress = "eaglezr\\infinitymirror\\resources\\images\\MirrorBase.png";
 	
-	protected IMPane( LoggingTool log, ErrorManagementSystem ems ) {
-		outputLabel = log.getLabel();
+	protected IMPane( ErrorManagementSystem ems ) {
+		IMLoggingTool log = IMLoggingTool.getLogger();
+		if ( log != null ) {
+			outputLabel = log.getLabel();
+		}
 		buildPaneShell();
 	}
 	
-	protected void updateContainer(Pane pane) {
+	protected void updateContainer( Pane pane ) {
 		innerPane.setCenter( pane );
 	}
 	
@@ -59,21 +63,22 @@ public class IMPane extends BorderPane {
 	 */
 	private Pane buildInfinityMirrorPane() {
 		// Initialize Mirror
-//		Rectangle[] lights = new Rectangle[180];
-//		for ( int i = 0; i < lights.length; i++ ) {
-//			lights[i] = new Rectangle( 4, 4, Color.RED );
-//		}
+		// Rectangle[] lights = new Rectangle[180];
+		// for ( int i = 0; i < lights.length; i++ ) {
+		// lights[i] = new Rectangle( 4, 4, Color.RED );
+		// }
 		
 		BorderPane pane = new BorderPane();
 		Image image = new Image( mirrorAddress, true );
 		ImageView imageView = new ImageView( image );
 		pane.setCenter( imageView );
-//		EventHandler<ActionEvent> eventHandler = e -> {
-//			// offsetColor();
-//			// TODO colorLights(paneType);
-//		};
-//		
-//		Timeline changingLights = new Timeline( new KeyFrame( Duration.millis( 250 ), eventHandler ) );
+		// EventHandler<ActionEvent> eventHandler = e -> {
+		// // offsetColor();
+		// // TODO colorLights(paneType);
+		// };
+		//
+		// Timeline changingLights = new Timeline( new KeyFrame(
+		// Duration.millis( 250 ), eventHandler ) );
 		
 		return pane;
 	}
@@ -100,15 +105,14 @@ public class IMPane extends BorderPane {
 			turnOffLights = new MenuItem( "Turn off lights" );
 			
 			exit = new MenuItem( "Exit" );
-			fileMenu.getItems().addAll( whiteLightMode, turnOnLights, turnOffLights,
-					exit );
+			fileMenu.getItems().addAll( whiteLightMode, turnOnLights, turnOffLights, exit );
 			
 			// View
-			Menu viewMenu = new Menu("View");
+			Menu viewMenu = new Menu( "View" );
 			
 			goToMain = new MenuItem( "Main Menu" );
 			
-			Menu goToViewMenu = new Menu("Go To...");
+			Menu goToViewMenu = new Menu( "Go To..." );
 			
 			goToAltColor = new MenuItem( "Alternating Color" );
 			

@@ -19,3 +19,8 @@ E6: Command Parsing Error
 	- Thrown in parseServerResponse()
 	- The command that was sent to the server is not recognized by the client
 
+E7: IMLoggingTool was accessed before it was created.
+	- Thrown when IMLoggingTool.getLogger() is called and the logger is not an IMLoggingTool
+	- Thrown when logger is either null or a LoggingTool instance (not IMLoggingTool)
+	
+	

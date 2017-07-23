@@ -1,5 +1,5 @@
 
-package eaglezr.infinitymirror.support;
+package eaglezr.support;
 
 import java.io.Closeable;
 import java.io.File;
@@ -10,83 +10,70 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.function.Consumer;
+import eaglezr.infinitymirror.support.ErrorManagementSystem;
+import eaglezr.infinitymirror.support.IMLoggingTool;
 import javafx.concurrent.Task;
-import javafx.scene.control.Label;
 
+/**
+ * Generates a logging tool that can be set to either print to the Console or to
+ * a log file with ease.
+ * 
+ * @author Mark Zeagler
+ *
+ */
 public class LoggingTool implements Closeable {
 	
+	// TODO Check if there is a way to save this
 	private static final int NUM_LOGS_TO_KEEP = 5;
 	
-	private static final String USER_TYPE_CLIENT = "client";
-	private static final String USER_TYPE_SERVER = "server";
-	private static final String USER_TYPE_APP = "app";
-	
 	public static enum Printers {
-		LOG_PRINTER, CONSOLE_PRINTER, LABEL_PRINTER
+		LOG_PRINTER( "log" ), CONSOLE_PRINTER( "console" );
+		
+		public final String NAME;
+		
+		private Printers( String name ) {
+			this.NAME = name;
+		}
 	};
 	
-	public static enum UserTypes {
-		CLIENT, SERVER, APP
-	};
+	protected static LoggingTool logger;
 	
-	private static LoggingTool logger;
-	
-	private Label outputLabel;
-	
-	private UserTypes currType;
-	
-	Consumer<String> defaultPrinter;
+	protected Consumer<String> defaultPrinter;
 	
 	Consumer<String> logPrinter;
 	Consumer<String> consolePrinter;
-	Consumer<String> labelPrinter;
 	
 	/**
 	 * For use when there is no label
 	 * 
 	 * @param userType
 	 */
-	public static LoggingTool startLogger( UserTypes userType, Printers defaultPrinter ) {
-		if ( logger == null || logger.currType != userType || !logger.defaultPrinter.equals( defaultPrinter ) ) {
-			logger = new LoggingTool( userType, defaultPrinter );
+	public static LoggingTool startLogger( Printers defaultPrinter, String rootLogName ) {
+		if ( logger == null || !logger.defaultPrinter.equals( defaultPrinter ) ) {
+			logger = new LoggingTool( defaultPrinter, rootLogName );
 		}
 		return logger;
 	}
 	
-	private LoggingTool( UserTypes userType, Printers defaultPrinter ) {
+	private LoggingTool( Printers defaultPrinter, String rootLogName ) {
 		new Thread( new ClearLogs() ).start();
+		this.logPrinter = generateLogPrinter( rootLogName );
+		this.consolePrinter = generateConsolePrinter();
 		setDefaultPrinter( defaultPrinter );
-		this.currType = userType;
-		this.logPrinter = generateLogPrinter( userType );
+	}
+	
+	protected LoggingTool( File outputFile ) {
+		new Thread( new ClearLogs() ).start();
+		this.logPrinter = generateLogPrinter( outputFile );
 		this.consolePrinter = generateConsolePrinter();
 	}
 	
 	/**
-	 * For use when there is a label
 	 * 
-	 * @param userType
-	 * @param label
-	 */
-	public static LoggingTool startLogger( UserTypes userType, Label label, Printers defaultPrinter ) {
-		if ( logger == null || logger.outputLabel == null || !logger.outputLabel.equals( label )
-				|| logger.currType != userType || !logger.defaultPrinter.equals( defaultPrinter ) ) {
-			logger = new LoggingTool( userType, label, defaultPrinter );
-		}
-		return logger;
-	}
-	
-	private LoggingTool( UserTypes userType, Label label, Printers defaultPrinter ) {
-		this( userType, defaultPrinter );
-		this.outputLabel = label;
-		this.labelPrinter = generateLabelPrinter( label );
-	}
-	
-	/**
-	 * 
-	 * @return The current {@link LoggingTool} or {@link null} if there isn't
+	 * @return The current {@link IMLoggingTool} or {@link null} if there isn't
 	 *         one.
 	 */
-	public LoggingTool getLogger() {
+	public static LoggingTool getLogger() {
 		return logger;
 	}
 	
@@ -96,15 +83,12 @@ public class LoggingTool implements Closeable {
 	 * @param userType
 	 * @return
 	 */
-	public static Consumer<String> generateLogPrinter( UserTypes userType ) {
+	public static Consumer<String> generateLogPrinter( String rootName ) {
 		GregorianCalendar calendar = new GregorianCalendar();
-		File logFile = new File( "logs\\im_"
-				+ ( userType == UserTypes.CLIENT ? USER_TYPE_CLIENT
-						: ( userType == UserTypes.SERVER ? USER_TYPE_SERVER : USER_TYPE_APP ) )
-				+ "_log " + calendar.get( GregorianCalendar.YEAR ) + "_" + calendar.get( GregorianCalendar.MONTH ) + "_"
-				+ calendar.get( GregorianCalendar.DAY_OF_MONTH ) + "_" + calendar.get( GregorianCalendar.HOUR_OF_DAY )
-				+ "_" + calendar.get( GregorianCalendar.MINUTE ) + "_" + calendar.get( GregorianCalendar.SECOND )
-				+ ".txt" );
+		File logFile = new File( "logs\\LoggingTool_log " + calendar.get( GregorianCalendar.YEAR ) + "_"
+				+ ( calendar.get( GregorianCalendar.MONTH ) + 1 ) + "_" + calendar.get( GregorianCalendar.DAY_OF_MONTH )
+				+ "_" + calendar.get( GregorianCalendar.HOUR_OF_DAY ) + "_" + calendar.get( GregorianCalendar.MINUTE )
+				+ "_" + calendar.get( GregorianCalendar.SECOND ) + ".txt" );
 		Consumer<String> printer;
 		try {
 			logFile.getParentFile().mkdirs();
@@ -115,7 +99,30 @@ public class LoggingTool implements Closeable {
 				outputStream.println( new Date( System.currentTimeMillis() ).toString() + ": " + s );
 			};
 		} catch ( FileNotFoundException e ) {
-			// TODO What should be done when errors have an error?
+			printer = generateConsolePrinter();
+			printer.accept(
+					"There was an error while creating the logger...\nWhat do you do when not even the error handling system works?" );
+			e.printStackTrace();
+		} catch ( IOException e ) {
+			printer = generateConsolePrinter();
+			printer.accept( "The log file could not be created" );
+			e.printStackTrace();
+		}
+		
+		return printer;
+	}
+	
+	public static Consumer<String> generateLogPrinter( File outputFile ) {
+		Consumer<String> printer;
+		try {
+			outputFile.getParentFile().mkdirs();
+			outputFile.createNewFile();
+			@SuppressWarnings( "resource" )
+			PrintStream outputStream = new PrintStream( outputFile );
+			printer = s -> {
+				outputStream.println( new Date( System.currentTimeMillis() ).toString() + ": " + s );
+			};
+		} catch ( FileNotFoundException e ) {
 			printer = generateConsolePrinter();
 			printer.accept(
 					"There was an error while creating the logger...\nWhat do you do when not even the error handling system works?" );
@@ -143,29 +150,12 @@ public class LoggingTool implements Closeable {
 	}
 	
 	/**
-	 * Generates a printer printer that prints a String to a
-	 * {@link javafx.scene.control.Label}
-	 * 
-	 * @param label
-	 * @return
-	 */
-	public static Consumer<String> generateLabelPrinter( Label label ) {
-		// FIXME Thread issue here
-		Consumer<String> printer = s -> {
-			label.setText( s );
-		};
-		return printer;
-	}
-	
-	/**
 	 * 
 	 * @param printer
 	 *            Use {@link ErrorManagementSystem.Printers}
 	 */
 	public void setDefaultPrinter( Printers printer ) {
-		if ( printer == Printers.LABEL_PRINTER ) {
-			this.defaultPrinter = this.labelPrinter;
-		} else if ( printer == Printers.CONSOLE_PRINTER ) {
+		if ( printer == Printers.CONSOLE_PRINTER ) {
 			this.defaultPrinter = this.consolePrinter;
 		} else if ( printer == Printers.LOG_PRINTER ) {
 			this.defaultPrinter = this.logPrinter;
@@ -193,20 +183,12 @@ public class LoggingTool implements Closeable {
 	 * @param s
 	 */
 	public void printAll( String s ) {
-		// FIXME Disabled for Thread issue
-		// if (labelPrinter != null) {
-		// labelPrinter.accept(s);
-		// }
 		if ( consolePrinter != null ) {
 			consolePrinter.accept( s );
 		}
 		if ( logPrinter != null ) {
 			logPrinter.accept( s );
 		}
-	}
-	
-	public Label getLabel() {
-		return this.outputLabel;
 	}
 	
 	/**
@@ -236,11 +218,7 @@ public class LoggingTool implements Closeable {
 				files[i] = files[i].getAbsoluteFile();
 				if ( files[i].length() == 0 ) {
 					filesToDelete.add( files[i] );
-				} else if ( files[i].getName()
-						.contains( "im_"
-								+ ( currType == UserTypes.CLIENT ? USER_TYPE_CLIENT
-										: ( currType == UserTypes.SERVER ? USER_TYPE_SERVER : USER_TYPE_APP ) )
-								+ "_log" ) ) {
+				} else if ( files[i].getName().contains( "LoggingTool_log" ) ) {
 					myFiles.add( files[i] );
 				}
 			}
@@ -269,7 +247,7 @@ public class LoggingTool implements Closeable {
 		 * @return true if {@linkleft} is older, false if {@linkright} is older
 		 */
 		private boolean getOlder( String left, String right ) {
-			return left.compareTo( right ) > 0;
+			return left.compareTo( right ) < 0;
 		}
 		
 		public void succeeded() {

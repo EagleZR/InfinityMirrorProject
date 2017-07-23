@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import eaglezr.infinitymirror.support.ClientCommands;
-import eaglezr.infinitymirror.support.LoggingTool;
+import eaglezr.support.LoggingTool;
 
 public class InfinityMirrorRelayServer {
 	
@@ -21,8 +21,7 @@ public class InfinityMirrorRelayServer {
 	private static boolean lightsOn = true;
 	private static boolean whiteLightMode = false;
 	
-	static LoggingTool log = LoggingTool.startLogger( LoggingTool.UserTypes.SERVER,
-			LoggingTool.Printers.CONSOLE_PRINTER );
+	static LoggingTool log = LoggingTool.startLogger( LoggingTool.Printers.CONSOLE_PRINTER, "im_server_log" );
 	
 	public static void main( String[] args ) {
 		

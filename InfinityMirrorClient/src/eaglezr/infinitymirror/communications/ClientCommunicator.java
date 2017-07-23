@@ -9,17 +9,17 @@ import java.security.AccessControlException;
 import eaglezr.infinitymirror.support.Error;
 import eaglezr.infinitymirror.support.ErrorManagementSystem;
 import eaglezr.infinitymirror.support.InfinityMirror;
-import eaglezr.infinitymirror.support.LoggingTool;
+import eaglezr.infinitymirror.support.IMLoggingTool;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 public class ClientCommunicator extends Communicator {
 	
 	private static ListenerService listener;
-	private LoggingTool log;
+	private IMLoggingTool log;
 	private ErrorManagementSystem ems;
 	
-	public ClientCommunicator( String url, int port, LoggingTool log, ErrorManagementSystem ems ) {
+	public ClientCommunicator( String url, int port, IMLoggingTool log, ErrorManagementSystem ems ) {
 		super( url, port );
 		this.log = log;
 		this.ems = ems;

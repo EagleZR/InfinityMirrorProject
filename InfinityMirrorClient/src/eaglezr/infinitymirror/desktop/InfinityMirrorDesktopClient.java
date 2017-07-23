@@ -28,6 +28,6 @@ public class InfinityMirrorDesktopClient extends Application {
 	@Override
 	public void stop() {
 		// FIXME Save config?
-		System.out.println( "Exiting" );
+		System.out.println( "Exiting... Don't forget about this..." );
 	}
 }

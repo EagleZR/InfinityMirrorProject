@@ -3,6 +3,7 @@ package eaglezr.infinitymirror.desktop;
 
 import eaglezr.infinitymirror.desktop.panes.*;
 import eaglezr.infinitymirror.support.*;
+import eaglezr.support.LoggingTool;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -14,8 +15,8 @@ import javafx.stage.Stage;
 public class ClientController {
 	
 	Label outputLabel = new Label( "" );
-	LoggingTool log = LoggingTool.startLogger( LoggingTool.UserTypes.CLIENT, outputLabel,
-			LoggingTool.Printers.LABEL_PRINTER );
+	LoggingTool log = IMLoggingTool.startLogger( IMLoggingTool.UserTypes.CLIENT, outputLabel,
+			IMLoggingTool.Printers.LABEL_PRINTER );
 	ErrorManagementSystem ems;
 	PanesController panes;
 	Stage primaryStage;
@@ -24,11 +25,11 @@ public class ClientController {
 	public ClientController( Stage stage ) {
 		this.primaryStage = stage;
 		ems = new ErrorManagementSystem (stage);
-		this.panes = new PanesController( this, log, ems );
+		this.panes = new PanesController( this, ems );
 		Scene scene = new Scene( panes.getPane(), 300, 400 );
 		this.primaryStage.setScene( scene );
 		this.primaryStage.setTitle( "Infinity Mirror Client" );
-//		this.primaryStage.resizableProperty().setValue( false );
+		this.primaryStage.resizableProperty().setValue( false );
 		this.primaryStage.show();
 		updatePanes();
 	}
