@@ -62,9 +62,9 @@ public class LoggingTool implements Closeable {
 		setDefaultPrinter( defaultPrinter );
 	}
 	
-	protected LoggingTool( File outputFile ) {
+	protected LoggingTool( String outputFileRootName ) {
 		new Thread( new ClearLogs() ).start();
-		this.logPrinter = generateLogPrinter( outputFile );
+		this.logPrinter = generateLogPrinter( outputFileRootName );
 		this.consolePrinter = generateConsolePrinter();
 	}
 	
@@ -152,7 +152,7 @@ public class LoggingTool implements Closeable {
 	/**
 	 * 
 	 * @param printer
-	 *            Use {@link ErrorManagementSystem.Printers}
+	 *            Use {@link Printers}
 	 */
 	public void setDefaultPrinter( Printers printer ) {
 		if ( printer == Printers.CONSOLE_PRINTER ) {

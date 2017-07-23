@@ -125,8 +125,7 @@ public class ClientCommunicator extends Communicator {
 		protected Task createTask() {
 			return new ServerListenerTask();
 		}
-		
-		// TODO Make immutable?
+
 		/**
 		 * The Task will wait to hear back from the server. Once it hears from
 		 * the server, it will update the main thread from the

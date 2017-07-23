@@ -45,20 +45,17 @@ public class PanesController {
 	
 	private Pane currPane;
 	
-	public PanesController( ClientController controller, ErrorManagementSystem ems ) {
+	public PanesController( ClientController controller ) {
 		this.controller = controller;
 		
-		this.shellPane = new IMPane( ems );
-		
-		this.mainMenu = new MainMenuPane( ems );
-		
-		this.subMenuWrapper = new SubMenuPane( ems );
-		
-		this.solidColor = new SolidColorPane( ems );
-		this.alternateColor = new AlternatingColorPane( ems );
-		this.rainbow = new RainbowPane( ems );
-		this.rainbowPulse = new RainbowPulsePane( ems );
-		this.pulse = new PulsePane( ems );
+		this.shellPane = new IMPane();
+		this.mainMenu = new MainMenuPane();
+		this.subMenuWrapper = new SubMenuPane();
+		this.solidColor = new SolidColorPane();
+		this.alternateColor = new AlternatingColorPane();
+		this.rainbow = new RainbowPane();
+		this.rainbowPulse = new RainbowPulsePane();
+		this.pulse = new PulsePane();
 		
 		this.currPane = this.mainMenu;
 		

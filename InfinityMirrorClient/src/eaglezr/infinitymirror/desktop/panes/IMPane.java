@@ -1,13 +1,7 @@
 
 package eaglezr.infinitymirror.desktop.panes;
 
-import eaglezr.infinitymirror.support.ErrorManagementSystem;
 import eaglezr.infinitymirror.support.IMLoggingTool;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -16,9 +10,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
 
 public class IMPane extends BorderPane {
 	
@@ -32,7 +23,7 @@ public class IMPane extends BorderPane {
 	
 	private String mirrorAddress = "eaglezr\\infinitymirror\\resources\\images\\MirrorBase.png";
 	
-	protected IMPane( ErrorManagementSystem ems ) {
+	protected IMPane() {
 		IMLoggingTool log = IMLoggingTool.getLogger();
 		if ( log != null ) {
 			outputLabel = log.getLabel();

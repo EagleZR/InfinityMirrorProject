@@ -1,8 +1,6 @@
 
 package eaglezr.infinitymirror.desktop.panes;
 
-import eaglezr.infinitymirror.support.ErrorManagementSystem;
-import eaglezr.infinitymirror.support.IMLoggingTool;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -19,7 +17,7 @@ public class MainMenuPane extends Pane {
 	protected Button onOffButton;
 	protected Button whiteLightModeButton;
 	
-	protected MainMenuPane( ErrorManagementSystem ems ) {
+	protected MainMenuPane() {
 		// Create instructional label
 		Label instructionalLabel = new Label( "Select the desired mode: " );
 		

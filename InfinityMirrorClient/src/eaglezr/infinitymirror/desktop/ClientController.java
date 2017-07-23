@@ -17,15 +17,15 @@ public class ClientController {
 	Label outputLabel = new Label( "" );
 	LoggingTool log = IMLoggingTool.startLogger( IMLoggingTool.UserTypes.CLIENT, outputLabel,
 			IMLoggingTool.Printers.LABEL_PRINTER );
-	ErrorManagementSystem ems;
 	PanesController panes;
 	Stage primaryStage;
 	public InfinityMirror currMirror;
 	
 	public ClientController( Stage stage ) {
 		this.primaryStage = stage;
-		ems = new ErrorManagementSystem (stage);
-		this.panes = new PanesController( this, ems );
+		ErrorManagementSystem.setStage( stage );
+		ErrorManagementSystem.setLogger( log );
+		this.panes = new PanesController( this );
 		Scene scene = new Scene( panes.getPane(), 300, 400 );
 		this.primaryStage.setScene( scene );
 		this.primaryStage.setTitle( "Infinity Mirror Client" );

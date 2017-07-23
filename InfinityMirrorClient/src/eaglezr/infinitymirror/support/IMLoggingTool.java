@@ -1,22 +1,21 @@
 
 package eaglezr.infinitymirror.support;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.function.Consumer;
 import eaglezr.support.LoggingTool;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 
-// TODO Make an eaglezr.infinitymirror.support.IMLoggingTool that extends
-// eaglezr.support.LoggingTool with the IM-specific stuffs?
+/**
+ * An extension of {@link eaglezr.support.LoggingTool} specifically made for
+ * {@link eaglezr.infinitymirror} usage.
+ * <p>
+ * The major inclusion is for support of out-putting information to a
+ * {@link Label} for display in the GUI.
+ * 
+ * @author Mark Zeagler
+ *
+ */
 public class IMLoggingTool extends LoggingTool {
 	
 	public static enum Printers {
@@ -57,12 +56,7 @@ public class IMLoggingTool extends LoggingTool {
 	}
 	
 	private IMLoggingTool( UserTypes userType, Label label, Printers defaultPrinter ) {
-		super( new File( "logs\\im_" + userType.NAME + "_log " + new GregorianCalendar().get( GregorianCalendar.YEAR )
-				+ "_" + new GregorianCalendar().get( GregorianCalendar.MONTH ) + "_"
-				+ new GregorianCalendar().get( GregorianCalendar.DAY_OF_MONTH ) + "_"
-				+ new GregorianCalendar().get( GregorianCalendar.HOUR_OF_DAY ) + "_"
-				+ new GregorianCalendar().get( GregorianCalendar.MINUTE ) + "_"
-				+ new GregorianCalendar().get( GregorianCalendar.SECOND ) + ".txt" ) );
+		super( "logs\\im_" + userType.NAME + "_log " );
 		this.outputLabel = label;
 		this.labelPrinter = generateLabelPrinter( label );
 		setDefaultPrinter( defaultPrinter );
@@ -85,10 +79,7 @@ public class IMLoggingTool extends LoggingTool {
 	 * @return
 	 */
 	public static Consumer<String> generateLabelPrinter( Label label ) {
-		// FIXME Thread issue here
-		Consumer<String> printer = s -> {
-			label.setText( s );
-		};
+		Consumer<String> printer = new RunnableLabelPrinter( label );
 		return printer;
 	}
 	
@@ -111,14 +102,35 @@ public class IMLoggingTool extends LoggingTool {
 	 * @param s
 	 */
 	public void printAll( String s ) {
-		// FIXME Make Printer work with Platform.runLater();
-//		 if (labelPrinter != null) {
-//		 Platform.runLater( labelPrinter.accept(s) );
-//		 }
+		if ( labelPrinter != null ) {
+			labelPrinter.accept( s );
+		}
 		super.printAll( s );
 	}
 	
 	public Label getLabel() {
 		return this.outputLabel;
+	}
+	
+	// Added to circumvent threading error in printAll()
+	private static class RunnableLabelPrinter implements Runnable, Consumer<String> {
+		
+		String s;
+		Label label;
+		
+		public RunnableLabelPrinter( Label label ) {
+			this.label = label;
+			
+		}
+		
+		public void accept( String s ) {
+			this.s = s;
+			Platform.runLater( this );
+		}
+		
+		@Override
+		public void run() {
+			label.setText( s );
+		}
 	}
 }

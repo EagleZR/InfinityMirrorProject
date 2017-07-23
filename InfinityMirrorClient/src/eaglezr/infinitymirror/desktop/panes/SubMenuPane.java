@@ -1,8 +1,6 @@
 
 package eaglezr.infinitymirror.desktop.panes;
 
-import eaglezr.infinitymirror.support.ErrorManagementSystem;
-import eaglezr.infinitymirror.support.IMLoggingTool;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -15,7 +13,7 @@ public class SubMenuPane extends Pane {
 	
 	private BorderPane subMenuPane;
 	
-	protected SubMenuPane( ErrorManagementSystem ems ) {
+	protected SubMenuPane() {
 		// Initialize GUI
 		backButton = new Button( "<-- Back" );
 		pushButton = new Button( "Push Changes" );
