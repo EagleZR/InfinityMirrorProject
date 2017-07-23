@@ -1,8 +1,9 @@
 
-package eaglezr.infinitymirror.client;
+package eaglezr.infinitymirror.desktop;
 
-import eaglezr.infinitymirror.client.panes.*;
+import eaglezr.infinitymirror.desktop.panes.*;
 import eaglezr.infinitymirror.support.*;
+import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
@@ -18,30 +19,29 @@ public class ClientController {
 	ErrorManagementSystem ems;
 	PanesController panes;
 	Stage primaryStage;
+	public InfinityMirror currMirror;
 	
 	public ClientController( Stage stage ) {
 		this.primaryStage = stage;
 		ems = new ErrorManagementSystem (stage);
 		this.panes = new PanesController( this, log, ems );
-		displayPane(panes.getPane());
-	}
-	
-	public void displayPane( Pane currentPane ) {
-		// Display the scene
-		Scene scene = new Scene( currentPane, 300, 400 );
-		currentPane.prefHeightProperty().bind( scene.heightProperty() );
-		System.out.println( currentPane.getHeight() );
+		Scene scene = new Scene( panes.getPane(), 300, 400 );
 		this.primaryStage.setScene( scene );
 		this.primaryStage.setTitle( "Infinity Mirror Client" );
-		this.primaryStage.resizableProperty().setValue( false );
+//		this.primaryStage.resizableProperty().setValue( false );
 		this.primaryStage.show();
+		updatePanes();
 	}
 	
-	public void sendMessage( int message ) {
+	public void pushMirror ( InfinityMirror mirror ) {
 		
 	}
 	
 	public void updatePanes() {
-		
+		primaryStage.getScene().setRoot( panes.getPane() );
+	}
+	
+	public void exit() {
+		Platform.exit();
 	}
 }

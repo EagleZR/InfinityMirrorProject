@@ -1,6 +1,10 @@
 import javafx.application.Application;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class test extends Application {
@@ -12,9 +16,13 @@ public class test extends Application {
 
 	@Override
 	public void start( Stage arg0 ) throws Exception {
-		GridPane pane = new GridPane();
-		pane.add( new Button(), 0, 0 );
-		pane.add( new Button(), 1, 0 );		
+		Image image = new Image( "eaglezr\\infinitymirror\\resources\\images\\MirrorBase.png", true );
+		ImageView imageView = new ImageView( image );	
+		Pane pane = new Pane();
+		pane.getChildren().add( imageView );
+		Scene scene = new Scene(pane);
+		arg0.setScene( scene );
+		arg0.show();
 	}
 	
 }

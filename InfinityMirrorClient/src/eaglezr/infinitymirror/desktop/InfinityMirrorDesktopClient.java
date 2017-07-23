@@ -1,5 +1,5 @@
 
-package eaglezr.infinitymirror.client;
+package eaglezr.infinitymirror.desktop;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -24,5 +24,10 @@ public class InfinityMirrorDesktopClient extends Application {
 		
 		this.controller = new ClientController( stage );
 	}
-
+	
+	@Override
+	public void stop() {
+		// FIXME Save config?
+		System.out.println( "Exiting" );
+	}
 }

@@ -1,9 +1,10 @@
 
-package eaglezr.infinitymirror.client.panes;
+package eaglezr.infinitymirror.desktop.panes;
 
-import eaglezr.infinitymirror.client.ClientController;
+import eaglezr.infinitymirror.desktop.ClientController;
 import eaglezr.infinitymirror.support.ClientCommands;
 import eaglezr.infinitymirror.support.ErrorManagementSystem;
+import eaglezr.infinitymirror.support.InfinityMirror;
 import eaglezr.infinitymirror.support.LoggingTool;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -26,6 +27,7 @@ public class PanesController {
 	private EventHandler<ActionEvent> toggleLights;
 	private EventHandler<ActionEvent> toggleWhiteLight;
 	
+	// TODO Is there a way to make these build themselves automatically based on the panes I build?
 	// Navigation events
 	private EventHandler<ActionEvent> displayMainMenu;
 	private EventHandler<ActionEvent> displaySolidColorPane;
@@ -33,6 +35,11 @@ public class PanesController {
 	private EventHandler<ActionEvent> displayRainbowPane;
 	private EventHandler<ActionEvent> displayRainbowPulsePane;
 	private EventHandler<ActionEvent> displayPulsePane;
+	
+	// Control events
+	private EventHandler<ActionEvent> displaySettings;
+	private EventHandler<ActionEvent> displayHelp;
+	private EventHandler<ActionEvent> exit;
 	
 	private Pane currPane;
 	
@@ -53,8 +60,6 @@ public class PanesController {
 		
 		this.currPane = this.mainMenu;
 		
-		sizePanes();
-		
 		initializeEventHandlers();
 		
 		addEventHandlers();
@@ -63,17 +68,13 @@ public class PanesController {
 	public Pane getPane() {
 		if ( this.currPane == this.mainMenu ) {
 			this.shellPane.updateContainer( currPane );
-			currPane.prefWidthProperty().bind( shellPane.widthProperty() );
-			currPane.prefHeightProperty().bind( shellPane.heightProperty() );
+			// currPane.prefWidthProperty().bind( shellPane.widthProperty() );
+			// currPane.prefHeightProperty().bind( shellPane.heightProperty() );
 		} else {
 			this.shellPane.updateContainer( this.subMenuWrapper );
 			this.subMenuWrapper.updateContainer( this.currPane );
 		}
 		return this.shellPane;
-	}
-	
-	private void sizePanes() {
-		
 	}
 	
 	private void initializeEventHandlers() {
@@ -110,28 +111,61 @@ public class PanesController {
 		
 		// Functional events
 		this.toggleLights = event -> {
-			controller.sendMessage( ClientCommands.LIGHTS.COMMAND );
+			// TODO Find a way to store previous or something so toggling actually toggles 
+//			controller.pushMirror( new InfinityMirror(InfinityMirror.Modes.) );
+//			controller.sendMessage( ClientCommands.LIGHTS.COMMAND );
 		};
 		
 		this.toggleWhiteLight = event -> {
-			controller.sendMessage( ClientCommands.WHITE_MODE.COMMAND );
+			
+//			controller.sendMessage( ClientCommands.WHITE_MODE.COMMAND );
 		};
 		
+		// Control Events
+		this.displayHelp = event -> {
+			
+		};
+		
+		this.displaySettings = event -> {
+			
+		};
+		
+		this.exit = event -> {
+			this.controller.exit();
+		};
 	}
 	
 	private void addEventHandlers() {
+		///////////////////
+		// Shell
+		///////////////////
+		
 		// Shell navigation
-		this.shellPane.menu.goToMain.setOnAction( this.displayMainMenu );
+		this.shellPane.menu.goToMain.setOnAction( displayMainMenu );
+		this.shellPane.menu.goToAltColor.setOnAction( this.displayAlternatingColorPane );
 		
 		// Shell functionality
 		this.shellPane.menu.turnOnLights.setOnAction( this.toggleLights );
 		this.shellPane.menu.turnOffLights.setOnAction( this.toggleLights );
 		this.shellPane.menu.whiteLightMode.setOnAction( this.toggleWhiteLight );
+		this.shellPane.menu.exit.setOnAction( this.exit );
+		
+		// Shell control
+		this.shellPane.menu.exit.setOnAction( this.exit );
+		// TODO Add other Shell event handlers
+		
+		///////////////////
+		// Wrapper
+		///////////////////
 		
 		// Wrapper navigation
 		this.subMenuWrapper.backButton.setOnAction( this.displayMainMenu );
 		
 		// Wrapper functionality
+		
+		///////////////////
+		// Main Menu
+		///////////////////
 		
 		// Main Menu navigation
 		this.mainMenu.alternatingColorModeButton.setOnAction( this.displayAlternatingColorPane );
@@ -144,21 +178,41 @@ public class PanesController {
 		this.mainMenu.onOffButton.setOnAction( this.toggleLights );
 		this.mainMenu.whiteLightModeButton.setOnAction( this.toggleWhiteLight );
 		
+		///////////////////
+		// Solid Color Panel
+		///////////////////
+		
 		// Solid Color navigation
 		
 		// Solid Color functionality
+		
+		///////////////////
+		// Alternate Color Panel
+		///////////////////
 		
 		// Alternate Color navigation
 		
 		// Alternate Color functionality
 		
+		///////////////////
+		// Rainbow Panel
+		///////////////////
+		
 		// Rainbow navigation
 		
 		// Rainbow functionality
 		
+		///////////////////
+		// Rainbow Pulse Panel
+		///////////////////
+		
 		// Rainbow Pulse navigation
 		
 		// Rainbow Pulse functionality
+		
+		///////////////////
+		// Pulse Panel
+		///////////////////
 		
 		// Pulse navigation
 		
@@ -171,7 +225,7 @@ public class PanesController {
 		this.shellPane.toggleLights( isOn );
 	}
 	
-	public void toggleWhiteLight(boolean isWhite) {
+	public void toggleWhiteLight( boolean isWhite ) {
 		this.mainMenu.toggleWhiteLight( isWhite );
 		this.shellPane.toggleWhiteLight( isWhite );
 	}

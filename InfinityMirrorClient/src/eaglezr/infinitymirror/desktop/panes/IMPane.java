@@ -1,4 +1,4 @@
-package eaglezr.infinitymirror.client.panes;
+package eaglezr.infinitymirror.desktop.panes;
 
 import eaglezr.infinitymirror.support.ErrorManagementSystem;
 import eaglezr.infinitymirror.support.LoggingTool;
@@ -6,6 +6,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -18,7 +19,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-public class IMPane extends Pane {
+public class IMPane extends BorderPane {
 	
 	/**
 	 * Add all content to be displayed in here.
@@ -28,27 +29,25 @@ public class IMPane extends Pane {
 	
 	protected BorderPane innerPane;
 	
+	private String mirrorAddress = "eaglezr\\infinitymirror\\resources\\images\\MirrorBase.png";
+	
 	protected IMPane( LoggingTool log, ErrorManagementSystem ems ) {
 		outputLabel = log.getLabel();
-		
-		// Initialize GUI
-		BorderPane shell = buildPaneShell();
-		this.getChildren().add( shell );
+		buildPaneShell();
 	}
 	
 	protected void updateContainer(Pane pane) {
 		innerPane.setCenter( pane );
 	}
 	
-	private BorderPane buildPaneShell() {
+	private void buildPaneShell() {
 		// Build Application Pane
-		BorderPane mainPane = new BorderPane();
-		mainPane.setTop( this.menu = new MyMenuBar() );
+		this.setTop( this.menu = new MyMenuBar() );
 		innerPane = new BorderPane();
-		innerPane.setTop( buildInfinityMirrorPane() );
-		mainPane.setCenter( innerPane );
-		mainPane.setBottom( outputLabel );
-		return mainPane;
+		Pane mirrorPane = buildInfinityMirrorPane();
+		innerPane.setTop( mirrorPane );
+		this.setCenter( innerPane );
+		this.setBottom( outputLabel );
 	}
 	
 	/**
@@ -60,14 +59,13 @@ public class IMPane extends Pane {
 	 */
 	private Pane buildInfinityMirrorPane() {
 		// Initialize Mirror
-		Rectangle[] lights = new Rectangle[180];
-		Color[] colors = new Color[180];
-		for ( int i = 0; i < lights.length; i++ ) {
-			lights[i] = new Rectangle();
-		}
+//		Rectangle[] lights = new Rectangle[180];
+//		for ( int i = 0; i < lights.length; i++ ) {
+//			lights[i] = new Rectangle( 4, 4, Color.RED );
+//		}
 		
 		BorderPane pane = new BorderPane();
-		Image image = new Image( "file:eaglezr\\infinitymirror\\resources\\images\\MirrorBase.png", true );
+		Image image = new Image( mirrorAddress, true );
 		ImageView imageView = new ImageView( image );
 		pane.setCenter( imageView );
 //		EventHandler<ActionEvent> eventHandler = e -> {
@@ -116,7 +114,7 @@ public class IMPane extends Pane {
 			
 			goToViewMenu.getItems().addAll( goToMain, goToAltColor );
 			
-			viewMenu.getItems().addAll( goToViewMenu, goToMain );
+			viewMenu.getItems().addAll( goToViewMenu );
 			
 			// TODO Add other MenuItems to the View tab
 			

@@ -1,7 +1,7 @@
 
-package eaglezr.infinitymirror.client.panes;
+package eaglezr.infinitymirror.desktop.panes;
 
-import eaglezr.infinitymirror.client.ClientController;
+import eaglezr.infinitymirror.desktop.ClientController;
 import eaglezr.infinitymirror.support.ErrorManagementSystem;
 import eaglezr.infinitymirror.support.LoggingTool;
 import javafx.scene.control.Button;

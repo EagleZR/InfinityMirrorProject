@@ -1,4 +1,4 @@
-package eaglezr.infinitymirror.client.panes;
+package eaglezr.infinitymirror.desktop.panes;
 
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;

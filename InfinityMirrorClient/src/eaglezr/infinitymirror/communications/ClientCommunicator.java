@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.security.AccessControlException;
 import eaglezr.infinitymirror.support.Error;
 import eaglezr.infinitymirror.support.ErrorManagementSystem;
+import eaglezr.infinitymirror.support.InfinityMirror;
 import eaglezr.infinitymirror.support.LoggingTool;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -17,7 +18,7 @@ public class ClientCommunicator extends Communicator {
 	private static ListenerService listener;
 	private LoggingTool log;
 	private ErrorManagementSystem ems;
-		
+	
 	public ClientCommunicator( String url, int port, LoggingTool log, ErrorManagementSystem ems ) {
 		super( url, port );
 		this.log = log;
@@ -27,24 +28,33 @@ public class ClientCommunicator extends Communicator {
 		}
 	}
 	
-	private void sendMessage( int command ) {
-		try {
-			SendMessageTask sendMessage = new SendMessageTask( command );
-			Thread thread = new Thread( sendMessage );
-			
-			thread.setDaemon( false );
-			thread.start();
-		} catch ( Exception e ) {
-			log.print( Error.COMMAND_NOT_SENT.toString() ); 
-		}
+//	private void sendMessage( int command ) {
+//		try {
+//			SendMessageTask sendMessage = new SendMessageTask( command );
+//			Thread thread = new Thread( sendMessage );
+//			
+//			thread.setDaemon( false );
+//			thread.start();
+//		} catch ( Exception e ) {
+//			log.print( Error.COMMAND_NOT_SENT.toString() );
+//		}
+//	}
+	
+	public void pushMirror( InfinityMirror mirror ) {
+		
 	}
 	
-//	// How do I want to do this?
-//	// Create IM object and update everything from that?
-//	private Byte[] getCache() {
-//		
-//		return null;
-//	}
+	public boolean checkMirrorChanged() {
+		
+		return false;
+	}
+	
+	// // How do I want to do this?
+	// // Create IM object and update everything from that?
+	// private Byte[] getCache() {
+	//
+	// return null;
+	// }
 	
 	private class SendMessageTask extends Task {
 		
@@ -136,7 +146,7 @@ public class ClientCommunicator extends Communicator {
 				this.port = ListenerService.this.port;
 			}
 			
-			// Separate thread 
+			// Separate thread
 			@Override
 			protected Object call() throws Exception {
 				// FIXME Listen for a signal from the server
