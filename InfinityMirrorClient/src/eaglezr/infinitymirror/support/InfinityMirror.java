@@ -129,12 +129,12 @@ public final class InfinityMirror implements Serializable, Comparator<InfinityMi
 	 *
 	 * @return A new instance of the class with everything copied except the lightsOn variable, which is reversed.
 	 */
-	public InfinityMirror toggleLights() {
+	public InfinityMirror getToggleLights() {
 		LoggingTool.getLogger().print( "Making a new InfinityMirror. Make sure you're saving it and not just throwing it away..." );
 		return new InfinityMirror( this, !this.lightsOn, this.whiteLightModeOn );
 	}
 
-	public InfinityMirror toggleWhiteLightMode() {
+	public InfinityMirror getToggleWhiteLightMode() {
 		LoggingTool.getLogger().print( "Making a new InfinityMirror. Make sure you're saving it and not just throwing it away..." );
 		return new InfinityMirror( this, this.lightsOn, !this.whiteLightModeOn );
 	}
