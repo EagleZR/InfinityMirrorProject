@@ -28,7 +28,7 @@ public class PanesController {
 	private EventHandler<ActionEvent> toggleWhiteLight;
 	private EventHandler<ActionEvent> pushMirror;
 	
-	// TODO Is there a way to make these build themselves automatically based on
+	// LATER Is there a way to make these build themselves automatically based on
 	// the panes I build?
 	// Navigation events
 	private EventHandler<ActionEvent> displayMainMenu;
@@ -64,6 +64,7 @@ public class PanesController {
 		addEventHandlers();
 	}
 	
+	// LATER Change this so it builds the panel each time
 	public Pane getPane() {
 		if ( this.currPane == this.mainMenu ) {
 			this.shellPane.updateContainer( currPane );
@@ -118,7 +119,7 @@ public class PanesController {
 		this.toggleLights = event -> {
 			// TODO Find a way to store previous or something so toggling
 			// actually toggles
-			// controller.pushMirror( new InfinityMirror(InfinityMirror.Modes.)
+			// controller.pushMirror( new InfinityMirror(InfinityMirror.Mode.)
 			// );
 			// controller.sendMessage( ClientCommands.LIGHTS.COMMAND );
 		};

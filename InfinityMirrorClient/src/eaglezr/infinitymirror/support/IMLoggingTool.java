@@ -49,6 +49,7 @@ public class IMLoggingTool extends LoggingTool {
 	 * 
 	 * @param userType
 	 * @param label
+	 * @param defaultPrinter
 	 */
 	public static LoggingTool startLogger( UserTypes userType, Label label, Printers defaultPrinter ) {
 		logger = new IMLoggingTool( userType, label, defaultPrinter );
@@ -56,7 +57,7 @@ public class IMLoggingTool extends LoggingTool {
 	}
 	
 	private IMLoggingTool( UserTypes userType, Label label, Printers defaultPrinter ) {
-		super( "logs\\im_" + userType.NAME + "_log " );
+		super( "im_" + userType.NAME );
 		this.outputLabel = label;
 		this.labelPrinter = generateLabelPrinter( label );
 		setDefaultPrinter( defaultPrinter );

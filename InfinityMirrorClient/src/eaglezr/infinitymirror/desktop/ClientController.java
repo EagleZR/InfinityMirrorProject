@@ -34,6 +34,10 @@ public class ClientController {
 		updatePanes();
 	}
 	
+	public void updateMirror() {
+		
+	}
+	
 	public void pushMirror ( InfinityMirror mirror ) {
 		
 	}

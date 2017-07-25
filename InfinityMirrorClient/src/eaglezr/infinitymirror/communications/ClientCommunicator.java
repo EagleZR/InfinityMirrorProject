@@ -24,21 +24,21 @@ public class ClientCommunicator extends Communicator {
 		this.log = log;
 		this.ems = ems;
 		if ( listener == null ) {
-			listener = new ListenerService();
+			listener = new ListenerService( url, port );
 		}
 	}
 	
-//	private void sendMessage( int command ) {
-//		try {
-//			SendMessageTask sendMessage = new SendMessageTask( command );
-//			Thread thread = new Thread( sendMessage );
-//			
-//			thread.setDaemon( false );
-//			thread.start();
-//		} catch ( Exception e ) {
-//			log.print( Error.COMMAND_NOT_SENT.toString() );
-//		}
-//	}
+	// private void sendMessage( int command ) {
+	// try {
+	// SendMessageTask sendMessage = new SendMessageTask( command );
+	// Thread thread = new Thread( sendMessage );
+	//
+	// thread.setDaemon( false );
+	// thread.start();
+	// } catch ( Exception e ) {
+	// log.print( Error.COMMAND_NOT_SENT.toString() );
+	// }
+	// }
 	
 	public void pushMirror( InfinityMirror mirror ) {
 		
@@ -111,14 +111,15 @@ public class ClientCommunicator extends Communicator {
 	 *
 	 */
 	@SuppressWarnings( "rawtypes" )
-	private class ListenerService extends Service {
+	private static class ListenerService extends Service {
 		
 		private final String url;
 		private final int port;
+		private InfinityMirror currMirror;
 		
-		public ListenerService() {
-			this.url = ClientCommunicator.this.url;
-			this.port = ClientCommunicator.this.port;
+		public ListenerService( String url, int port ) {
+			this.url = url;
+			this.port = port;
 		}
 		
 		@Override
@@ -126,10 +127,18 @@ public class ClientCommunicator extends Communicator {
 			return new ServerListenerTask();
 		}
 
+		public synchronized InfinityMirror getMirror() {
+			return this.currMirror;
+		}
+
+		public synchronized  void setMirror( InfinityMirror newMirror ) {
+			this.currMirror = newMirror;
+		}
+
 		/**
 		 * The Task will wait to hear back from the server. Once it hears from
 		 * the server, it will update the main thread from the
-		 * {@link succeeded()} method.
+		 * Task.succeeded() method.
 		 * 
 		 * @author Mark
 		 *
@@ -165,7 +174,7 @@ public class ClientCommunicator extends Communicator {
 			// Main thread
 			protected void failed() {
 				super.failed();
-				log.print( "Could not update from the server" );
+				IMLoggingTool.getLogger().print( "Could not update from the server" );
 			}
 		}
 	}

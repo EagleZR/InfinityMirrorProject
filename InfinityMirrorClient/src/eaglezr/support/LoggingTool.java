@@ -23,7 +23,7 @@ import javafx.concurrent.Task;
  */
 public class LoggingTool implements Closeable {
 	
-	// TODO Check if there is a way to save this
+	// LATER Check if there is a to save/load this from a file
 	private static final int NUM_LOGS_TO_KEEP = 5;
 	
 	public static enum Printers {
@@ -45,8 +45,6 @@ public class LoggingTool implements Closeable {
 	
 	/**
 	 * For use when there is no label
-	 * 
-	 * @param userType
 	 */
 	public static LoggingTool startLogger( Printers defaultPrinter, String rootLogName ) {
 		if ( logger == null || !logger.defaultPrinter.equals( defaultPrinter ) ) {
@@ -85,7 +83,7 @@ public class LoggingTool implements Closeable {
 	 */
 	public static Consumer<String> generateLogPrinter( String rootName ) {
 		GregorianCalendar calendar = new GregorianCalendar();
-		File logFile = new File( "logs\\LoggingTool_log " + calendar.get( GregorianCalendar.YEAR ) + "_"
+		File logFile = new File( "logs\\" + rootName + "_log " + calendar.get( GregorianCalendar.YEAR ) + "_"
 				+ ( calendar.get( GregorianCalendar.MONTH ) + 1 ) + "_" + calendar.get( GregorianCalendar.DAY_OF_MONTH )
 				+ "_" + calendar.get( GregorianCalendar.HOUR_OF_DAY ) + "_" + calendar.get( GregorianCalendar.MINUTE )
 				+ "_" + calendar.get( GregorianCalendar.SECOND ) + ".txt" );

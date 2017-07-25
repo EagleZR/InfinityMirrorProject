@@ -76,50 +76,60 @@ public class IMPane extends BorderPane {
 	
 	protected class MyMenuBar extends MenuBar {
 		
+		// File
+		protected MenuItem load;
+		protected MenuItem save;
+		protected MenuItem exit;
+		
+		// View
+		protected MenuItem goToMain;
+		protected MenuItem goToAltColor;
+		
+		// Options
 		protected MenuItem whiteLightMode;
 		protected MenuItem turnOnLights;
 		protected MenuItem turnOffLights;
-		protected MenuItem exit;
 		
-		protected MenuItem goToMain;
-		protected MenuItem goToAltColor;
+		// Help
+		protected MenuItem about;
 		
 		protected MyMenuBar() {
 			// File
 			Menu fileMenu = new Menu( "File" );
 			
-			whiteLightMode = new MenuItem( "Toggle White Light" );
-			
-			turnOnLights = new MenuItem( "Turn on lights" );
-			turnOnLights.setVisible( false );
-			
-			turnOffLights = new MenuItem( "Turn off lights" );
-			
+			load = new MenuItem( "Load Favorite..." );
+			save = new MenuItem( "Save Favorite..." );
 			exit = new MenuItem( "Exit" );
-			fileMenu.getItems().addAll( whiteLightMode, turnOnLights, turnOffLights, exit );
+			
+			fileMenu.getItems().addAll( load, save, exit );
 			
 			// View
 			Menu viewMenu = new Menu( "View" );
+			Menu goToViewMenu = new Menu( "Go To" );
 			
 			goToMain = new MenuItem( "Main Menu" );
-			
-			Menu goToViewMenu = new Menu( "Go To..." );
-			
 			goToAltColor = new MenuItem( "Alternating Color" );
+			// TODO Add other MenuItems to the View tab
 			
 			goToViewMenu.getItems().addAll( goToMain, goToAltColor );
-			
 			viewMenu.getItems().addAll( goToViewMenu );
-			
-			// TODO Add other MenuItems to the View tab
 			
 			// Options
 			Menu optionsMenu = new Menu( "Options" );
-			// TODO Add Options Menu components
+			
+			whiteLightMode = new MenuItem( "Toggle White Light" );
+			turnOnLights = new MenuItem( "Turn on lights" );
+			turnOnLights.setVisible( false );
+			turnOffLights = new MenuItem( "Turn off lights" );
+			
+			optionsMenu.getItems().addAll( whiteLightMode, turnOnLights, turnOffLights );
 			
 			// Help
 			Menu helpMenu = new Menu( "Help" );
-			// TODO Add Help Menu components
+			
+			about = new MenuItem("About...");
+			
+			helpMenu.getItems().addAll( about );
 			
 			// Create Menu Bar
 			this.getMenus().addAll( fileMenu, viewMenu, optionsMenu, helpMenu );
