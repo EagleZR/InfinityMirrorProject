@@ -5,18 +5,19 @@ import eaglezr.infinitymirror.support.InfinityMirrorPreview;
 import eaglezr.infinitymirror.support.IMLoggingTool;
 import eaglezr.support.LoggingTool;
 import javafx.scene.paint.Color;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-class InfinityMirrorTest {
+import static org.junit.Assert.assertTrue;
 
-	@BeforeAll static void setup(){
+public class InfinityMirrorTest {
+
+	@BeforeClass public static void setup(){
 		// Ugh, so uncivilized
 		IMLoggingTool.startLogger( LoggingTool.Printers.CONSOLE_PRINTER, InfinityMirrorTest.class.getSimpleName() );
 	}
 
-	@Test void testConstructors() {
+	@Test public void testConstructors() {
 		// Test with 2 colors
 		InfinityMirror mirror = new InfinityMirror( InfinityMirror.Mode.PULSE_MODE, Color.BLACK, Color.ANTIQUEWHITE );
 		assertTrue( mirror.getMode().equals( InfinityMirror.Mode.PULSE_MODE ) );
@@ -51,19 +52,18 @@ class InfinityMirrorTest {
 		}
 	}
 
-	@Test void testPreview() {
+	@Test public void testPreview() {
 		InfinityMirrorPreview preview = new InfinityMirrorPreview();
 		preview.currMode = InfinityMirror.Mode.SOLID_COLOR_MODE;
 		preview.primaryColor = Color.BLUE;
 		InfinityMirror m1 = preview.generateInfinityMirror();
 		InfinityMirror m2 = new InfinityMirror( InfinityMirror.Mode.SOLID_COLOR_MODE, Color.BLUE );
 
-		System.out.println( m1.compare( m1, m2 ) );
 		assertTrue( m1.getMode().equals( m2.getMode() ) );
 		assertTrue( m1.getPrimaryColor().equals( m2.getPrimaryColor() ) );
 		assertTrue( m1.getSecondaryColor().equals( m2.getSecondaryColor() ) );
 		// FIXME InfinityMirror.equals is broken
-		// assertTrue( m1.equals( m2 ) );
+		assertTrue( m1.equals( m2 ) );
 	}
 
 }

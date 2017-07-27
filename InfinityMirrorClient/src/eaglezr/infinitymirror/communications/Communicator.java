@@ -1,16 +1,28 @@
 package eaglezr.infinitymirror.communications;
+import java.io.Closeable;
 import java.security.AccessControlException;
 
-public abstract class Communicator {
-	
+public abstract class Communicator implements Closeable {
+
+	public enum CommunicatorType {
+		CLIENT,
+		SERVER;
+	}
+
 	protected String url;
 	protected int port;
+	protected CommunicatorType type;
 	
-	protected Communicator(String url, int port) {
-		this.url = url;
-		this.port = port;
+	protected Communicator(String serverURL, int outputPort) {
+		this.type = CommunicatorType.CLIENT;
+		this.url = serverURL;
+		this.port = outputPort;
 	}
-	
+
+	protected Communicator(int listeningPort) {
+		this.type = CommunicatorType.SERVER;
+		this.port = listeningPort;
+	}
 	private void transmit(Byte[] message) {
 		// FIXME Add security system
 	} 
@@ -24,5 +36,4 @@ public abstract class Communicator {
 	protected void formConnection() throws AccessControlException {
 		// FIXME Add security system
 	}
-	
 }

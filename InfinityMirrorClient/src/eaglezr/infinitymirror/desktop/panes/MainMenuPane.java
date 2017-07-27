@@ -1,6 +1,7 @@
 
 package eaglezr.infinitymirror.desktop.panes;
 
+import eaglezr.javafx.panes.ButtonPane;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -23,13 +24,9 @@ public class MainMenuPane extends Pane {
 		
 		// Create modal control buttons
 		solidColorModeButton = new Button( "Solid Color Mode" );
-		
 		alternatingColorModeButton = new Button( "Alternating Color Mode" );
-		
 		rainbowModeButton = new Button( "Rainbow Mode" );
-		
 		rainbowPulseModeButton = new Button( "Rainbow Pulse Mode" );
-		
 		pulseModeButton = new Button( "Pulse Mode" );
 		
 		// Add modal control buttons to modal control pane

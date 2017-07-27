@@ -28,18 +28,6 @@ public class ClientCommunicator extends Communicator {
 		}
 	}
 	
-	// private void sendMessage( int command ) {
-	// try {
-	// SendMessageTask sendMessage = new SendMessageTask( command );
-	// Thread thread = new Thread( sendMessage );
-	//
-	// thread.setDaemon( false );
-	// thread.start();
-	// } catch ( Exception e ) {
-	// log.print( Error.COMMAND_NOT_SENT.toString() );
-	// }
-	// }
-	
 	public void pushMirror( InfinityMirror mirror ) {
 		
 	}
@@ -98,6 +86,10 @@ public class ClientCommunicator extends Communicator {
 			// ems.displayError(primaryStage, "E4: Communications Thread
 			// Failed");
 		}
+	}
+
+	public void close() {
+
 	}
 	
 	/**

@@ -2,17 +2,17 @@ package eaglezr.infinitymirror.support;
 
 import java.io.Serializable;
 import java.util.Comparator;
+
 import eaglezr.support.LoggingTool;
 
 import javafx.scene.paint.Color;
 
 /**
- * The data representation of the Infinity Mirror's status that will be passed
- * between the clients and server.
+ * The data representation of the Infinity Mirror's status that will be passed between the clients and server.
  *
  * @author Mark Zeagler
  */
-public final class InfinityMirror implements Serializable, Comparator<InfinityMirror> {
+public final class InfinityMirror implements Serializable, Comparable<InfinityMirror> {
 
 	/**
 	 * Auto-generated Serial ID
@@ -94,9 +94,9 @@ public final class InfinityMirror implements Serializable, Comparator<InfinityMi
 	}
 
 	public Color[] getLights() {
-		if (!this.lightsOn) {
+		if ( !this.lightsOn ) {
 			return setAllLights( new Color[180], Color.BLACK );
-		} else if (this.whiteLightModeOn) {
+		} else if ( this.whiteLightModeOn ) {
 			return setAllLights( new Color[180], Color.WHITE );
 		} else {
 			return this.lights;
@@ -104,9 +104,9 @@ public final class InfinityMirror implements Serializable, Comparator<InfinityMi
 	}
 
 	public Color getPrimaryColor() {
-		if (!this.lightsOn) {
-			return Color.BLACK ;
-		} else if (this.whiteLightModeOn) {
+		if ( !this.lightsOn ) {
+			return Color.BLACK;
+		} else if ( this.whiteLightModeOn ) {
 			return Color.WHITE;
 		} else {
 			return this.primaryColor;
@@ -114,9 +114,9 @@ public final class InfinityMirror implements Serializable, Comparator<InfinityMi
 	}
 
 	public Color getSecondaryColor() {
-		if (!this.lightsOn) {
+		if ( !this.lightsOn ) {
 			return Color.BLACK;
-		} else if (this.whiteLightModeOn) {
+		} else if ( this.whiteLightModeOn ) {
 			return Color.WHITE;
 		} else {
 			return this.secondaryColor;
@@ -124,30 +124,36 @@ public final class InfinityMirror implements Serializable, Comparator<InfinityMi
 	}
 
 	/**
-	 * Creates a new {@link InfinityMirror} instance with the lightsOn value reversed.
-	 * <p>The new object must be created because this class is immutable.</p>
+	 * Creates a new {@link InfinityMirror} instance with the lightsOn value reversed. <p>The new object must be created
+	 * because this class is immutable.</p>
 	 *
 	 * @return A new instance of the class with everything copied except the lightsOn variable, which is reversed.
 	 */
 	public InfinityMirror getToggleLights() {
-		LoggingTool.getLogger().print( "Making a new InfinityMirror. Make sure you're saving it and not just throwing it away..." );
+		LoggingTool.getLogger()
+				.print( "Making a new InfinityMirror. Make sure you're saving it and not just throwing it away..." );
 		return new InfinityMirror( this, !this.lightsOn, this.whiteLightModeOn );
 	}
 
 	public InfinityMirror getToggleWhiteLightMode() {
-		LoggingTool.getLogger().print( "Making a new InfinityMirror. Make sure you're saving it and not just throwing it away..." );
+		LoggingTool.getLogger()
+				.print( "Making a new InfinityMirror. Make sure you're saving it and not just throwing it away..." );
 		return new InfinityMirror( this, this.lightsOn, !this.whiteLightModeOn );
 	}
 
-	public int compare( InfinityMirror m1, InfinityMirror m2 ) {
+	public int compareTo( InfinityMirror m2 ) {
 		int total = 0;
-		total += compare( m1.lightsOn, m2.lightsOn );
-		total += compare( m1.whiteLightModeOn, m2.whiteLightModeOn );
-		total += m1.currMode.compareTo( m2.currMode );
+		total += compare( this.lightsOn, m2.lightsOn );
+		total += compare( this.whiteLightModeOn, m2.whiteLightModeOn );
+		total += this.currMode.compareTo( m2.currMode );
 		// Ignore comparing lights. It's a derived value, anyways.
-		total += compare( m1.primaryColor, m2.primaryColor );
-		total += compare( m1.secondaryColor, m2.secondaryColor );
+		total += compare( this.primaryColor, m2.primaryColor );
+		total += compare( this.secondaryColor, m2.secondaryColor );
 		return total;
+	}
+
+	public boolean equals( InfinityMirror m2 ) {
+		return compareTo( m2 ) == 0;
 	}
 
 	// LATER Fix setLights()

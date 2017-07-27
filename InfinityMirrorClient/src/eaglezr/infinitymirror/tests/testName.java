@@ -7,7 +7,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-public class test extends Application {
+public class testName extends Application {
 	
 	public static void main( String[] args ) {
 		Application.launch( args );
