@@ -5,18 +5,15 @@ import eaglezr.infinitymirror.desktop.panes.*;
 import eaglezr.infinitymirror.support.*;
 import eaglezr.support.LoggingTool;
 import javafx.application.Platform;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class ClientController {
 	
 	Label outputLabel = new Label( "" );
 	LoggingTool log = IMLoggingTool.startLogger( IMLoggingTool.UserTypes.CLIENT, outputLabel,
-			IMLoggingTool.Printers.LABEL_PRINTER );
+			IMLoggingTool.IM_Printers.LABEL_PRINTER );
 	PanesController panes;
 	Stage primaryStage;
 	public InfinityMirror currMirror;

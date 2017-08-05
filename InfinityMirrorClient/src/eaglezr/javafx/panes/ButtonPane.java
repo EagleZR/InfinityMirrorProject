@@ -76,8 +76,6 @@ public class ButtonPane extends GridPane {
 		int width = width();
 		int height = height();
 
-		System.out.println( "New Button Layout of width: " + width + " and height: " + height );
-
 		int u = 0;
 		// LATER There's probably a more elegant way to do this, but it works for now...
 		if ( orientation == Orientation.Vertical ) {

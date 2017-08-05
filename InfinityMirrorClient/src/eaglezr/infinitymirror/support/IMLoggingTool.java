@@ -18,30 +18,31 @@ import javafx.scene.control.Label;
  */
 public class IMLoggingTool extends LoggingTool {
 	
-	public static enum Printers {
+	public enum IM_Printers {
 		LOG_PRINTER( "log" ), CONSOLE_PRINTER( "console" ), LABEL_PRINTER( "label" );
 		
 		public final String NAME;
 		
-		private Printers( String name ) {
+		IM_Printers( String name ) {
 			this.NAME = name;
 		}
-	};
+	}
 	
-	public static enum UserTypes {
+	public enum UserTypes {
 		CLIENT( "client" ), SERVER( "server" ), APP( "app" );
 		
 		public final String NAME;
 		
-		private UserTypes( String name ) {
+		UserTypes( String name ) {
 			this.NAME = name;
 		}
-	};
+	}
 	
 	private Label outputLabel;
 	
-	protected Consumer<String> defaultPrinter;
-	
+	private Consumer<String> printer;
+
+	private IM_Printers defaultPrinter;
 	Consumer<String> labelPrinter;
 	
 	/**
@@ -51,16 +52,17 @@ public class IMLoggingTool extends LoggingTool {
 	 * @param label
 	 * @param defaultPrinter
 	 */
-	public static LoggingTool startLogger( UserTypes userType, Label label, Printers defaultPrinter ) {
+	public static LoggingTool startLogger( UserTypes userType, Label label, IM_Printers defaultPrinter ) {
 		logger = new IMLoggingTool( userType, label, defaultPrinter );
 		return logger;
 	}
 	
-	private IMLoggingTool( UserTypes userType, Label label, Printers defaultPrinter ) {
-		super( "im_" + userType.NAME );
+	private IMLoggingTool( UserTypes userType, Label label, IM_Printers defaultPrinter ) {
+//		super( "im_" + userType.NAME );
+		super.logPrinter = LoggingTool.generateLogPrinter( "im_" + userType.NAME );
 		this.outputLabel = label;
 		this.labelPrinter = generateLabelPrinter( label );
-		setDefaultPrinter( defaultPrinter );
+		setPrinter( defaultPrinter );
 	}
 	
 	public static IMLoggingTool getLogger() {
@@ -87,13 +89,13 @@ public class IMLoggingTool extends LoggingTool {
 	/**
 	 * 
 	 * @param printer
-	 *            Use {@link ErrorManagementSystem.Printers}
+	 *            Use {@link IMLoggingTool}.IM_Printers
 	 */
-	public void setDefaultPrinter( Printers printer ) {
-		if ( printer == Printers.LABEL_PRINTER ) {
-			this.defaultPrinter = this.labelPrinter;
+	public void setPrinter( IM_Printers printer ) {
+		if ( printer == IM_Printers.LABEL_PRINTER ) {
+			this.printer = this.labelPrinter;
 		} else {
-			super.setDefaultPrinter( LoggingTool.Printers.valueOf( printer.NAME ) );
+			super.setPrinter( LoggingTool.Printers.valueOf( printer.NAME ) );
 		}
 	}
 	
