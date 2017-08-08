@@ -1,92 +1,37 @@
-package eaglezr.support;
+package eaglezr.support.logs;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.function.Consumer;
 
-import javafx.concurrent.Task;
-
-/**
- * Generates a logging tool that can be set to either print to the Console or to a log file with ease.
- *
- * @author Mark Zeagler
- * @version 0.9
- */
-public class LoggingTool implements Closeable {
+public abstract class LoggingTool implements Closeable {
 
 	// LATER Check if there is a to save/load this from a file
 	private static final int NUM_LOGS_TO_KEEP = 5;
 
 	/**
-	 * These labels enable the specification of which printer is being referenced.
-	 */
-	public enum Printers {
-		LOG_PRINTER( "log" ), CONSOLE_PRINTER( "console" );
-
-		public final String NAME;
-
-		Printers( String name ) {
-			this.NAME = name;
-		}
-	}
-
-	protected static LoggingTool logger;
-
-	protected final Printers defaultPrinter;
-	protected final Consumer<String> printer;
-
-	protected final Consumer<String> logPrinter;
-	protected final Consumer<String> consolePrinter;
-
-	/**
-	 * Creates a {@link LoggingTool} with the specified default printer and using the root name to generate the log
-	 * file.
+	 * Prints a String through the default printer.
 	 *
-	 * @param defaultPrinter The default printer that will be printed to when the generic print(String) function is
-	 *                       called.
-	 * @param rootLogName    The root name for the log file name.
-	 * @return The constructed {@link LoggingTool}.
+	 * @param s The String to be printed.
 	 */
-	public static LoggingTool startLogger( Printers defaultPrinter, String rootLogName ) {
-		if ( logger == null || !( logger.defaultPrinter == defaultPrinter ) ) {
-			logger = new LoggingTool( defaultPrinter, rootLogName );
-		}
-		return logger;
-	}
-
-	private LoggingTool( Printers defaultPrinter, String rootLogName ) {
-		new Thread( new ClearLogs() ).start();
-		this.logPrinter = generateLogPrinter( rootLogName );
-		this.consolePrinter = generateConsolePrinter();
-
-		if ( defaultPrinter == Printers.CONSOLE_PRINTER ) {
-			this.defaultPrinter = defaultPrinter;
-			this.printer = this.consolePrinter;
-		} else if ( defaultPrinter == Printers.LOG_PRINTER ) {
-			this.defaultPrinter = defaultPrinter;
-			this.printer = this.logPrinter;
-		} else {
-			System.out.println( "Default printer could not be set" );
-		}
-	}
-
-	protected LoggingTool( String outputFileRootName ) {
-		new Thread( new ClearLogs() ).start();
-		this.logPrinter = generateLogPrinter( outputFileRootName );
-		this.consolePrinter = generateConsolePrinter();
-	}
+	public abstract void print(String s);
 
 	/**
-	 * @return The current {@link LoggingTool} or {@link null} if there isn't one.
+	 * Prints a String through all of the printers.
+	 *
+	 * @param s The String to be printed.
 	 */
-	public static LoggingTool getLogger() {
-		return logger;
+	public abstract void printAll(String s);
+
+	/**
+	 * Generates a printer that prints a String to the console
+	 *
+	 * @return
+	 */
+	public static Consumer<String> generateConsolePrinter() {
+		return s -> System.out.println( new Date( System.currentTimeMillis() ).toString() + ": " + s );
 	}
 
 	/**
@@ -154,59 +99,20 @@ public class LoggingTool implements Closeable {
 	}
 
 	/**
-	 * Generates a printer that prints a String to the console
-	 *
-	 * @return
-	 */
-	public static Consumer<String> generateConsolePrinter() {
-		Consumer<String> printer = s -> {
-			System.out.println( new Date( System.currentTimeMillis() ).toString() + ": " + s );
-		};
-
-		return printer;
-	}
-
-	/**
-	 * Prints a String through the default printer
-	 *
-	 * @param s
-	 */
-	public void print( String s ) {
-		if ( this.printer != null ) {
-			this.printer.accept( s );
-		} else {
-			printAll( "There is no set printer" );
-		}
-	}
-
-	/**
-	 * Prints a String through all of the printers
-	 *
-	 * @param s
-	 */
-	public void printAll( String s ) {
-		if ( consolePrinter != null ) {
-			consolePrinter.accept( s );
-		}
-		if ( logPrinter != null ) {
-			logPrinter.accept( s );
-		}
-	}
-
-	/**
 	 * Manages the build-up of log files
 	 */
 	public void close() {
-
-		logger = null;
 		new Thread( new ClearLogs() ).start();
 	}
 
-	@SuppressWarnings( "rawtypes" ) private class ClearLogs extends Task {
+	protected class ClearLogs implements Runnable {
 
-		@Override protected Object call() throws Exception {
-			purgeLogs();
-			return null;
+		public void run() {
+			try {
+				purgeLogs();
+			} catch ( FileNotFoundException e ) {
+				printAll("Logs could not be cleared");
+			}
 		}
 
 		private void purgeLogs() throws FileNotFoundException {
@@ -225,8 +131,8 @@ public class LoggingTool implements Closeable {
 			}
 
 			// Deletes empty files
-			for ( int i = 0; i < filesToDelete.size(); i++ ) {
-				filesToDelete.get( i ).delete();
+			for ( File file : filesToDelete ) {
+				file.delete();
 			}
 
 			// Deletes the oldest files until only 5 are left
@@ -248,15 +154,6 @@ public class LoggingTool implements Closeable {
 		 */
 		private boolean getOlder( String left, String right ) {
 			return left.compareTo( right ) < 0;
-		}
-
-		public void succeeded() {
-			super.succeeded();
-		}
-
-		public void failed() {
-			super.failed();
-			print( "Logs could not be cleared" );
 		}
 	}
 }
