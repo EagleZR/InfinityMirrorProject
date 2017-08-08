@@ -1,6 +1,7 @@
 package eaglezr.infinitymirror.communications;
 
 import eaglezr.infinitymirror.support.InfinityMirror;
+import eaglezr.support.logs.LoggingTool;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -11,9 +12,10 @@ import java.util.concurrent.Executor;
 public class ServerCommunicator extends Communicator {
 
 	// TODO Way to communicate with thread?
-	private ListeningThread listeningThread;
+	private Listener listener;
 	private ArrayList<ConnectionThread> connections = new ArrayList<>();
 	public InfinityMirrorWrapper imWrapper = new InfinityMirrorWrapper();
+	private LoggingTool log;
 
 	/**
 	 * Creates a {@link ServerCommunicator} that listens on a specified port.
@@ -22,11 +24,14 @@ public class ServerCommunicator extends Communicator {
 	 */
 	public ServerCommunicator( int listeningPort ) {
 		super( listeningPort );
+		log = LoggingTool.getLogger();
 		System.out.println( "Making a new ServerCommunicator" );
-		listeningThread = new ListeningThread( listeningPort );
+		listener = new Listener( listeningPort );
+		Thread listeningThread = new Thread (listener);
+		listeningThread.setName( "Infinity Mirror Listen" );
 	}
 
-	private synchronized void startNewConnectionThread(ConnectionThread connection) {
+	private synchronized void startNewConnectionThread( ConnectionThread connection ) {
 		// TODO Send connection to Executor or start running immediately?
 		connections.add( connection );
 	}
@@ -36,10 +41,12 @@ public class ServerCommunicator extends Communicator {
 	 */
 	public void close() {
 		// TODO Close the ServerCommunicator
+
 	}
 
 	/**
 	 * Returns the number of current connections.
+	 *
 	 * @return
 	 */
 	public synchronized int getNumConnections() {
@@ -90,7 +97,7 @@ public class ServerCommunicator extends Communicator {
 	 * A {@link Runnable} instance that listens for a client to make a connection. Once made, the connection is passed
 	 * to another thread so this thread can listen for more connections.
 	 */
-	private class ListeningThread implements Runnable {
+	private class Listener implements Runnable {
 
 		private ServerSocket serverSocket;
 
@@ -99,7 +106,7 @@ public class ServerCommunicator extends Communicator {
 		 *
 		 * @param port - The port used to listen for a new connection.
 		 */
-		public ListeningThread( int port ) {
+		public Listener( int port ) {
 			try {
 				serverSocket = new ServerSocket( port );
 			} catch ( IOException e ) {
@@ -132,7 +139,7 @@ public class ServerCommunicator extends Communicator {
 	}
 
 	/**
-	 * Handles new connections away from the {@link ListeningThread} so the listener can continue listening for new
+	 * Handles new connections away from the {@link Listener} so the listener can continue listening for new
 	 * connections while a current connection is handled.
 	 */
 	private class ConnectionThread implements Runnable {
@@ -158,9 +165,9 @@ public class ServerCommunicator extends Communicator {
 					if ( purpose == 1 ) {
 						handleRequestStatus( in, out );
 					} else if ( purpose == 2 ) {
-						handleNewMirror( in, out );
-					} else if (purpose == 3) {
-						handleRetrieveMirror( in, out );
+						acceptMirror( in, out );
+					} else if ( purpose == 3 ) {
+						sendMirror( in, out );
 					} else {
 						// LATER Print "Connection purpose out of bounds" error
 					}
@@ -174,26 +181,21 @@ public class ServerCommunicator extends Communicator {
 			try {
 				connection.close();
 			} catch ( IOException e ) {
-				// LATER Print "Connection cannot be closed" error
+				// LATER Print "Connection closing error" error
 			}
 		}
 
 		/**
 		 * When a connection is made, this method validates that the client is an authorized user.
-		 *
-		 * @param in
-		 * @param out
 		 */
 		private boolean validateClient( DataInputStream in, DataOutputStream out ) {
+			log.print( "DON'T FORGET SECURITY!!!!!!!" );
 			return true; // LATER Validate clients.
 		}
 
 		/**
 		 * This method handles processes and communications necessary to handle the status request made by a
 		 * connection.
-		 *
-		 * @param in
-		 * @param out
 		 */
 		private void handleRequestStatus( DataInputStream in, DataOutputStream out ) {
 			// TODO Handle Status Request
@@ -201,34 +203,33 @@ public class ServerCommunicator extends Communicator {
 
 		/**
 		 * This method handles processes and communications for when a client wants to push a new mirror.
-		 *
-		 * @param in
-		 * @param out
 		 */
-		private void handleNewMirror( DataInputStream in, DataOutputStream out ) {
+		private void acceptMirror( DataInputStream in, DataOutputStream out ) {
 			try {
-				InfinityMirror newMirror = (InfinityMirror)new ObjectInputStream( in ).readObject();
+				InfinityMirror newMirror = (InfinityMirror) new ObjectInputStream( in ).readObject();
 				imWrapper.setCurrMirror( newMirror );
 				out.writeBoolean( true );
 			} catch ( IOException e ) {
-				// TODO Print connection error
+				log.print( "There was an error opening the ObjectInputStream." );
 			} catch ( ClassNotFoundException e ) {
-				// TODO Not sure what error to print
+				log.print( "There was an error in recognizing the class while receiving a new mirror." );
 			}
 		}
 
 		/**
 		 * This method handles processes and communications for when a client wants to pull the current mirror.
-		 *
-		 * @param in
-		 * @param out
 		 */
-		private void handleRetrieveMirror( DataInputStream in, DataOutputStream out ) {
+		private void sendMirror( DataInputStream in, DataOutputStream out ) {
 			// TODO Handle Retrieve Mirror Request
 			try {
-				new ObjectOutputStream (out).writeObject( imWrapper.getCurrMirror() );
+				boolean successful = false;
+				while(!successful){
+					new ObjectOutputStream( out ).writeObject( imWrapper.getCurrMirror() );
+					successful = in.readBoolean();
+					// LATER Read client response?
+				}
 			} catch ( IOException e ) {
-				// TODO Print connection error
+				log.print( "There was an error opening the ObjectInputStream." );
 			}
 		}
 	}

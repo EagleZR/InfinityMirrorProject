@@ -1,6 +1,6 @@
 package eaglezr.javafx.panes;
 
-import eaglezr.support.LoggingTool;
+import eaglezr.support.logs.LoggingTool;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 
@@ -218,8 +218,7 @@ public class ButtonPane extends GridPane {
 			this.maxYExpansion = value;
 			setButtons( this.buttons );
 		} else {
-			LoggingTool.generateConsolePrinter()
-					.accept( this.getClass().getName() + "Negative Values are not accepted." );
+			LoggingTool.print( this.getClass().getName() + "Negative Values are not accepted." );
 		}
 	}
 
@@ -244,8 +243,7 @@ public class ButtonPane extends GridPane {
 			this.minXRetraction = value;
 			setButtons( this.buttons );
 		} else {
-			LoggingTool.generateConsolePrinter()
-					.accept( this.getClass().getName() + "Negative Values are not accepted." );
+			LoggingTool.print( this.getClass().getName() + "Negative Values are not accepted." );
 		}
 	}
 

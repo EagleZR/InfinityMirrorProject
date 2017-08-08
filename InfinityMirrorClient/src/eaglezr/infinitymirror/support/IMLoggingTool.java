@@ -16,6 +16,8 @@ import javafx.scene.control.Label;
  */
 public class IMLoggingTool extends LoggingTool {
 
+	private static IMLoggingTool logger;
+
 	public enum Printers {
 		LOG_PRINTER( "log" ), CONSOLE_PRINTER( "console" ), LABEL_PRINTER( "label" );
 
@@ -45,7 +47,7 @@ public class IMLoggingTool extends LoggingTool {
 	 * @param label
 	 * @param defaultPrinter
 	 */
-	public static LoggingTool startLogger( UserTypes userType, Label label, Printers defaultPrinter ) {
+	public static IMLoggingTool startLogger( UserTypes userType, Label label, Printers defaultPrinter ) {
 		logger = new IMLoggingTool( userType, label, defaultPrinter );
 		return logger;
 	}
@@ -69,7 +71,7 @@ public class IMLoggingTool extends LoggingTool {
 		}
 	}
 
-	public static synchronized LoggingTool getLogger() {
+	public static synchronized IMLoggingTool getLogger() {
 		if ( logger == null ) {
 			LoggingTool.getLogger();
 			logger.printAll( Error.IM_LOG_NULL.getText() );

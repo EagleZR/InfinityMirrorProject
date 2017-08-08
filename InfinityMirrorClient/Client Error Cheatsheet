@@ -1,3 +1,9 @@
+E-1: Test
+    - Just for testing
+
+E0: Default
+    - Nothing wrong.
+
 E1: Connection not made
 	- IOException in SendMessageTask.call()
 

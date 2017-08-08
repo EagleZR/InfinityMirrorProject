@@ -2,7 +2,7 @@ package eaglezr.infinitymirror.tests;
 
 import eaglezr.infinitymirror.communications.ServerCommunicator;
 import eaglezr.infinitymirror.support.InfinityMirror;
-import eaglezr.support.LoggingTool;
+import eaglezr.support.logs.LoggingTool;
 import javafx.scene.paint.Color;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -14,14 +14,18 @@ import java.net.Socket;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+/**
+ * This isn't gonna work... I think there's an issue with the threading, or something.
+ */
 public class ServerCommunicatorTest {
 
-	static LoggingTool log = LoggingTool.startLogger( LoggingTool.Printers.CONSOLE_PRINTER, "ServerCommunicatorTest" );
+	static LoggingTool log = LoggingTool.getLogger();
 
 	static ServerCommunicator communicator;
 	static int port = 11896;
 
 	@BeforeClass public static void setup() {
+		log.addPrinter( LoggingTool.generateLogPrinter( "ServerCommunicatorTest" ) );
 		communicator = new ServerCommunicator( port );
 	}
 
@@ -42,7 +46,7 @@ public class ServerCommunicatorTest {
 			out2.writeInt( 1 );
 
 			System.out.println( Inet4Address.getLocalHost() );
-			System.out.println(communicator.getNumConnections());
+			System.out.println( communicator.getNumConnections() );
 
 			assertTrue( communicator.getNumConnections() == 2 );
 

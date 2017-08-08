@@ -1,9 +1,8 @@
 package eaglezr.infinitymirror.support;
 
 import java.io.Serializable;
-import java.util.Comparator;
 
-import eaglezr.support.LoggingTool;
+import eaglezr.support.logs.LoggingTool;
 
 import javafx.scene.paint.Color;
 
@@ -37,7 +36,6 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 		}
 	}
 
-	// TODO InfinityMirror accessors
 	private final boolean lightsOn;
 	private final boolean whiteLightModeOn;
 
@@ -48,13 +46,13 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 	private final Color secondaryColor;
 
 	private InfinityMirror( Mode mode ) {
-		this( mode, null, Color.BLACK );
-		// LATER Throw EMS error if mode isn't 1, 2, 5, or 6?
+		this( mode, Color.BLACK, Color.BLACK );
+		// LATER Throw log error if mode isn't 1, 2, 5, or 6?
 	}
 
 	public InfinityMirror( Mode mode, Color primaryColor ) {
 		this( mode, primaryColor, Color.BLACK );
-		// LATER Throw EMS error if Mode is not 3?
+		// LATER Throw log error if Mode is not 3?
 	}
 
 	public InfinityMirror( Mode mode, Color primaryColor, Color secondaryColor ) {
@@ -63,14 +61,14 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 		this.secondaryColor = secondaryColor;
 		this.lightsOn = true;
 		this.whiteLightModeOn = false;
-		this.lights = setLights( new Color[180], getMode() );
+		this.lights = setLights( new Color[180], getMode(), getPrimaryColor(), getSecondaryColor() );
 	}
 
 	private InfinityMirror( InfinityMirror mirror, boolean lightsOn, boolean whiteLightModeOn ) {
 		this.lightsOn = lightsOn;
 		this.whiteLightModeOn = whiteLightModeOn;
 		this.currMode = mirror.currMode;
-		this.lights = setLights( new Color[180], getMode() );
+		this.lights = setLights( new Color[180], getMode(), getPrimaryColor(), getSecondaryColor() );
 		this.primaryColor = mirror.primaryColor;
 		this.secondaryColor = mirror.secondaryColor;
 	}
@@ -79,7 +77,7 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 		this.lightsOn = preview.lightsOn;
 		this.whiteLightModeOn = preview.whiteLightModeOn;
 		this.currMode = preview.currMode;
-		this.lights = setLights( new Color[180], getMode() );
+		this.lights = setLights( new Color[180], getMode(), getPrimaryColor(), getSecondaryColor() );
 		this.primaryColor = preview.primaryColor;
 		this.secondaryColor = preview.secondaryColor;
 	}
@@ -130,14 +128,12 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 	 * @return A new instance of the class with everything copied except the lightsOn variable, which is reversed.
 	 */
 	public InfinityMirror getToggleLights() {
-		LoggingTool.getLogger()
-				.print( "Making a new InfinityMirror. Make sure you're saving it and not just throwing it away..." );
+		LoggingTool.print( "Making a new InfinityMirror. Make sure you're saving it and not just throwing it away..." );
 		return new InfinityMirror( this, !this.lightsOn, this.whiteLightModeOn );
 	}
 
 	public InfinityMirror getToggleWhiteLightMode() {
-		LoggingTool.getLogger()
-				.print( "Making a new InfinityMirror. Make sure you're saving it and not just throwing it away..." );
+		LoggingTool.print( "Making a new InfinityMirror. Make sure you're saving it and not just throwing it away..." );
 		return new InfinityMirror( this, this.lightsOn, !this.whiteLightModeOn );
 	}
 
@@ -156,13 +152,8 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 		return compareTo( m2 ) == 0;
 	}
 
-	// LATER Fix setLights()
-	private static Color[] setLights( Color[] lights, Mode mode, Color primaryColor ) {
-		return setLights( lights, mode, primaryColor, null );
-	}
-
-	private static Color[] setLights( Color[] lights, Mode mode ) {
-		return setLights( lights, mode, null, null );
+	public String toString() {
+		return getMode().name() + ": " + getPrimaryColor() + ", " + getSecondaryColor();
 	}
 
 	// LATER Figure out how best to set the lights
@@ -183,14 +174,14 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 		} else if ( mode == Mode.PULSE_MODE ) {
 			// TODO Pulse Mode Lights
 		} else {
-			// LATER Print "Invalid Mode" error to EMS
+			// LATER Print "Invalid Mode" error to log
 		}
 		return lights; // TODO Fix above return statements and remove this
 	}
 
 	private static Color[] setAllLights( Color[] lights, Color color ) {
 		if ( color == null ) {
-			// LATER Print "Null Color" error to EMS
+			// LATER Print "Null Color" error to log
 		} else {
 			for ( int i = 0; i < lights.length; i++ ) {
 				lights[i] = color;
@@ -201,9 +192,9 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 
 	private static Color[] setAlternateLights( Color[] lights, Color color1, Color color2 ) {
 		if ( color1 == null ) {
-			// LATER Print "Null Primary Color" error to EMS
+			// LATER Print "Null Primary Color" error to log
 		} else if ( color2 == null ) {
-			// LATER Print "Null Secondary Color" error to EMS
+			// LATER Print "Null Secondary Color" error to log
 		} else {
 			for ( int i = 0; i < lights.length; i++ ) {
 				if ( i % 2 == 0 ) {
@@ -213,7 +204,7 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 				}
 			}
 		}
-		return lights; // TODO Fix above return statements and remove this
+		return lights;
 	}
 
 	// https://stackoverflow.com/questions/13229592/implement-comparator-for-primitive-boolean-type

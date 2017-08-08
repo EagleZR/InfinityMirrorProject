@@ -1,121 +1,123 @@
-
 package eaglezr.infinitymirror.communications;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.security.AccessControlException;
-import eaglezr.infinitymirror.support.Error;
-import eaglezr.infinitymirror.support.ErrorManagementSystem;
-import eaglezr.infinitymirror.support.InfinityMirror;
+
+import eaglezr.infinitymirror.support.ErrorPopupSystem;
 import eaglezr.infinitymirror.support.IMLoggingTool;
+import eaglezr.infinitymirror.support.InfinityMirror;
+import eaglezr.infinitymirror.support.Error;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 public class ClientCommunicator extends Communicator {
-	
+
 	private static ListenerService listener;
 	private IMLoggingTool log;
-	private ErrorManagementSystem ems;
-	
-	public ClientCommunicator( String url, int port, IMLoggingTool log, ErrorManagementSystem ems ) {
+
+	public ClientCommunicator( String url, int port ) {
 		super( url, port );
-		this.log = log;
-		this.ems = ems;
+		this.log = IMLoggingTool.getLogger();
 		if ( listener == null ) {
 			listener = new ListenerService( url, port );
 		}
 	}
-	
+
 	public void pushMirror( InfinityMirror mirror ) {
-		
+		Thread sendMessageThread = new Thread( new SendMirrorTask( mirror ) );
+		sendMessageThread.setName( "Infinity Mirror Client Push" );
+		sendMessageThread.start();
 	}
-	
-	public boolean checkMirrorChanged() {
-		
-		return false;
+
+
+	public void close() {
+		// TODO Close ClientCommunicator
 	}
-	
-	// // How do I want to do this?
-	// // Create IM object and update everything from that?
-	// private Byte[] getCache() {
-	//
-	// return null;
-	// }
-	
-	private class SendMessageTask extends Task {
-		
-		private int command;
+
+	private class SendMirrorTask extends Task {
+
+		private InfinityMirror mirror;
 		private int response;
-		
-		public SendMessageTask( int command ) {
-			this.command = command;
+		private Error error = Error.DEFAULT;
+
+		SendMirrorTask( InfinityMirror mirror ) {
+			this.mirror = mirror;
 		}
-		
-		@Override
-		protected Object call() throws Exception {
+
+		@Override protected Object call() throws Exception {
 			response = -1;
-			try { // Any
+			try {
+				log.print( "Pushing mirror." );
 				Socket socket = new Socket( url, port );
 				DataInputStream in = new DataInputStream( socket.getInputStream() );
 				DataOutputStream out = new DataOutputStream( socket.getOutputStream() );
-				formConnection();
-				out.write( command );
-				response = in.read();
+				if (connectToServer( in, out )) {
+					ObjectOutputStream o_out = new ObjectOutputStream( out );
+					formConnection();
+					o_out.writeObject( mirror );
+					response = in.read();
+					if (response == 1) { // LATER Establish server response
+						IMLoggingTool.print( "Mirror successfully pushed." );
+					} else {
+						IMLoggingTool.print( "Mirror could not be pushed." );
+					}
+				} else {
+					// LATER EMS: "Unable to authenticate with server."
+				}
 				socket.close();
 			} catch ( IOException e ) {
-				return "E1: Connection not made";
+				error = Error.CONNECTION_NOT_MADE;
 			} catch ( AccessControlException e ) {
-				return "E5: Connection Rejected";
+				error = Error.CONNECTION_REJECTED;
 			}
-			
-			// FIXME Determine if possible to avoid returning anything
+
+			// LATER Determine if possible to avoid returning anything
 			return response;
 		}
-		
-		@Override
-		protected void succeeded() {
+
+		private boolean connectToServer(DataInputStream in, DataOutputStream out) {
+			// LATER Client: Connect to server
+			log.print( "DON'T FORGET SECURITY!!!!!!!!" );
+			return true;
+		}
+
+		@Override protected void succeeded() {
 			super.succeeded();
-			// parseServerResponse(command, response);
+			log.print( "Push Mirror Thread succeeded. Closing Thread." );
+			if ( error != Error.DEFAULT ) {
+				ErrorPopupSystem.displayError( error );
+			}
 		}
-		
-		@Override
-		protected void failed() {
+
+		@Override protected void failed() {
 			super.failed();
-			// ems.displayError(primaryStage, "E4: Communications Thread
-			// Failed");
+			log.print( "Push Mirror Thread failed. Closing Thread." );
+			if ( error != Error.DEFAULT ) {
+				ErrorPopupSystem.displayError( error );
+			}
 		}
 	}
 
-	public void close() {
-
-	}
-	
 	/**
-	 * Creates a server on the client that is constantly listening to the remote
-	 * server to detect changes. The process is separated onto another thread so
-	 * its running doesn't noticeably affect the running of the client. A
-	 * listening service was used so the client isn't constantly calling the
-	 * server for updates.
-	 * 
-	 * @author Mark
+	 * Creates a server on the client that is constantly listening to the remote server to detect changes. The process
+	 * is separated onto another thread so its running doesn't noticeably affect the running of the client. A listening
+	 * service was used so the client isn't constantly calling the server for updates.
 	 *
+	 * @author Mark
 	 */
-	@SuppressWarnings( "rawtypes" )
-	private static class ListenerService extends Service {
-		
+	@SuppressWarnings( "rawtypes" ) private class ListenerService extends Service implements Closeable {
+
 		private final String url;
 		private final int port;
 		private InfinityMirror currMirror;
-		
-		public ListenerService( String url, int port ) {
+
+		ListenerService( String url, int port ) {
 			this.url = url;
 			this.port = port;
 		}
-		
-		@Override
-		protected Task createTask() {
+
+		@Override protected Task createTask() {
 			return new ServerListenerTask();
 		}
 
@@ -123,50 +125,55 @@ public class ClientCommunicator extends Communicator {
 			return this.currMirror;
 		}
 
-		public synchronized  void setMirror( InfinityMirror newMirror ) {
+		public synchronized void setMirror( InfinityMirror newMirror ) {
 			this.currMirror = newMirror;
 		}
 
+		public void close() {
+
+		}
+
 		/**
-		 * The Task will wait to hear back from the server. Once it hears from
-		 * the server, it will update the main thread from the
-		 * Task.succeeded() method.
-		 * 
-		 * @author Mark
+		 * The Task will wait to hear back from the server. Once it hears from the server, it will update the main
+		 * thread from the Task.succeeded() method.
 		 *
+		 * @author Mark
 		 */
 		private class ServerListenerTask extends Task {
-			
+
 			private final String url;
 			private final int port;
-			
+
+			//////////////
 			// Main thread
+			//////////////
+
+
 			public ServerListenerTask() {
 				this.url = ListenerService.this.url;
 				this.port = ListenerService.this.port;
 			}
-			
-			// Separate thread
-			@Override
-			protected Object call() throws Exception {
-				// FIXME Listen for a signal from the server
-				
-				return null;
-			}
-			
-			// Main thread
-			/**
-			 * Update data from here
-			 */
+
+			// Update ClientController from here
 			protected void succeeded() {
 				super.succeeded();
 				// TODO Update according to server response
 			}
-			
-			// Main thread
+
 			protected void failed() {
 				super.failed();
-				IMLoggingTool.getLogger().print( "Could not update from the server" );
+				// TODO Make Error for log.print( "Could not update from the server" );
+			}
+
+			//////////////////
+			// Separate thread
+			//////////////////
+
+
+			@Override protected Object call() throws Exception {
+				// FIXME Listen for a signal from the server
+
+				return null;
 			}
 		}
 	}

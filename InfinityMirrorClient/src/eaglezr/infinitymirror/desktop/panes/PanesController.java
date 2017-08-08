@@ -2,9 +2,6 @@
 package eaglezr.infinitymirror.desktop.panes;
 
 import eaglezr.infinitymirror.desktop.ClientController;
-import eaglezr.infinitymirror.support.ClientCommands;
-import eaglezr.infinitymirror.support.ErrorManagementSystem;
-import eaglezr.infinitymirror.support.InfinityMirror;
 import eaglezr.infinitymirror.support.IMLoggingTool;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

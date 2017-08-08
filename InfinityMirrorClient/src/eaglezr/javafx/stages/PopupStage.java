@@ -1,5 +1,5 @@
 
-package eaglezr.infinitymirror.support;
+package eaglezr.javafx.stages;
 
 import javafx.scene.Scene;
 import javafx.stage.Modality;

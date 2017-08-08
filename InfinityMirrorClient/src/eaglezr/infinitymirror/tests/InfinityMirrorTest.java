@@ -3,18 +3,23 @@ package eaglezr.infinitymirror.tests;
 import eaglezr.infinitymirror.support.InfinityMirror;
 import eaglezr.infinitymirror.support.InfinityMirrorPreview;
 import eaglezr.infinitymirror.support.IMLoggingTool;
-import eaglezr.support.LoggingTool;
+import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Don't run this test! Requires JavaFX to be running or something. Issue is caused by using the {@link Label}.
+ * <p>LATER Look into unit testing JavaFX.
+ * </p>
+ */
 public class InfinityMirrorTest {
-
-	@BeforeClass public static void setup(){
+	@BeforeClass public static void setup() {
 		// Ugh, so uncivilized
-		IMLoggingTool.startLogger( LoggingTool.Printers.CONSOLE_PRINTER, InfinityMirrorTest.class.getSimpleName() );
+		IMLoggingTool
+				.startLogger( IMLoggingTool.UserTypes.TEST, new Label( "" ), IMLoggingTool.Printers.CONSOLE_PRINTER );
 	}
 
 	@Test public void testConstructors() {

@@ -4,6 +4,8 @@ package eaglezr.infinitymirror.support;
 public enum Error {
 	
 	// @formatter:off
+	TEST(-1, "Just testing the errors..." ),
+	DEFAULT(0, ""),
 	CONNECTION_NOT_MADE(1, "Connection not made."),
 	COMMAND_NOT_SENT(2, "Command not sent."),
 	INCORRECT_RESPONSE(3, "Received Incorrect Response: "),
