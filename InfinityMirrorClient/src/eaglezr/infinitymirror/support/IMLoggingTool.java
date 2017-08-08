@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
  * The major inclusion is for support of out-putting information to a {@link Label} for display in the GUI.
  *
  * @author Mark Zeagler
+ * @version 0.9
  */
 public class IMLoggingTool extends LoggingTool {
 
@@ -35,15 +36,7 @@ public class IMLoggingTool extends LoggingTool {
 		}
 	}
 
-	private Label outputLabel;
-
-	private static IMLoggingTool logger;
-	private Consumer<String> printer;
-
-	private final Printers defaultPrinter;
-	private final Consumer<String> logPrinter;
-	private final Consumer<String> consolePrinter;
-	private Consumer<String> labelPrinter;
+	private static Label outputLabel;
 
 	/**
 	 * For use when there is a label
@@ -52,40 +45,44 @@ public class IMLoggingTool extends LoggingTool {
 	 * @param label
 	 * @param defaultPrinter
 	 */
-	public static IMLoggingTool startLogger( UserTypes userType, Label label, Printers defaultPrinter ) {
+	public static LoggingTool startLogger( UserTypes userType, Label label, Printers defaultPrinter ) {
 		logger = new IMLoggingTool( userType, label, defaultPrinter );
 		return logger;
 	}
 
 	private IMLoggingTool( UserTypes userType, Label label, Printers defaultPrinter ) {
-		this.logPrinter = generateLogPrinter( "im_" + userType.NAME );
-		this.outputLabel = label;
-		this.labelPrinter = generateLabelPrinter( label );
-		this.consolePrinter = generateConsolePrinter();
+		Consumer<String> logPrinter = generateLogPrinter( "im_" + userType.NAME );
+		outputLabel = label;
+		Consumer<String> labelPrinter = generateLabelPrinter( label );
+
+		addAllPrinters( logPrinter, labelPrinter );
 
 		if ( defaultPrinter == Printers.CONSOLE_PRINTER ) {
-			this.defaultPrinter = defaultPrinter;
-			this.printer = this.consolePrinter;
+			printer = printers.get( 0 );
 		} else if ( defaultPrinter == Printers.LOG_PRINTER ) {
-			this.defaultPrinter = defaultPrinter;
-			this.printer = this.logPrinter;
+			printer = logPrinter;
 		} else if ( defaultPrinter == Printers.LABEL_PRINTER ) {
-			this.defaultPrinter = defaultPrinter;
-			this.printer = this.labelPrinter;
+			printer = labelPrinter;
 		} else {
-			this.defaultPrinter = Printers.CONSOLE_PRINTER;
-			this.printer = this.consolePrinter;
-			System.out.println( "Default printer could not be set" );
+			printer = printers.get( 0 );
+			printAll( "Default printer could not be set" );
 		}
 	}
 
-	public static IMLoggingTool getLogger() {
-		if ( logger != null && logger.getClass() == IMLoggingTool.class ) {
-			return logger;
-		} else {
+	public static synchronized LoggingTool getLogger() {
+		if ( logger == null ) {
+			LoggingTool.getLogger();
 			logger.printAll( Error.IM_LOG_NULL.getText() );
-			return null;
 		}
+		return logger;
+	}
+
+	public static synchronized void print( Error error ) {
+		LoggingTool.print( error.getText() );
+	}
+
+	public static synchronized void printAll( Error error ) {
+		LoggingTool.printAll( error.getText() );
 	}
 
 	/**
@@ -99,42 +96,14 @@ public class IMLoggingTool extends LoggingTool {
 		return printer;
 	}
 
-	/**
-	 * Prints a String through the default printer.
-	 *
-	 * @param s The String to be printed.
-	 */
-	public synchronized void print( String s ) {
-		if ( this.printer != null ) {
-			this.printer.accept( s );
-		} else {
-			printAll( "There is no set printer" );
-		}
+	public static Label getLabel() {
+		return outputLabel;
 	}
 
 	/**
-	 * Prints a String through all of the printers.
-	 *
-	 * @param s The String to be printed.
+	 * 	Added to circumvent threading error in printAll()
 	 */
-	public synchronized void printAll( String s ) {
-		if ( labelPrinter != null ) {
-			labelPrinter.accept( s );
-		}
-		if ( consolePrinter != null ) {
-			consolePrinter.accept( s );
-		}
-		if ( logPrinter != null ) {
-			logPrinter.accept( s );
-		}
-	}
-
-	public Label getLabel() {
-		return this.outputLabel;
-	}
-
-	// Added to circumvent threading error in printAll()
-	private static class RunnableLabelPrinter implements Runnable, Consumer<String> {
+	public static class RunnableLabelPrinter implements Runnable, Consumer<String> {
 
 		String s;
 		Label label;

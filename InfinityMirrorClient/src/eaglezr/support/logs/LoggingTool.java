@@ -1,37 +1,115 @@
 package eaglezr.support.logs;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.function.Consumer;
 
-public abstract class LoggingTool implements Closeable {
+import javafx.concurrent.Task;
+
+/**
+ * Generates a logging tool that can be set to either print to the Console or to a log file with ease.
+ *
+ * @author Mark Zeagler
+ * @version 0.9.1
+ */
+public class LoggingTool implements Closeable {
 
 	// LATER Check if there is a to save/load this from a file
-	private static final int NUM_LOGS_TO_KEEP = 5;
+	private static int NUM_LOGS_TO_KEEP = 5;
+	protected static LoggingTool logger;
+	protected Consumer<String> printer;
+	protected ArrayList<Consumer<String>> printers;
 
 	/**
-	 * Prints a String through the default printer.
-	 *
-	 * @param s The String to be printed.
+	 * Creates a LoggingTool with a ConsolePrinter as the default printer.
 	 */
-	public abstract void print(String s);
+	protected LoggingTool() {
+		printers = new ArrayList<>();
+		printers.add( generateConsolePrinter() );
+		printer = printers.get( 0 );
+	}
 
 	/**
-	 * Prints a String through all of the printers.
-	 *
-	 * @param s The String to be printed.
+	 * @return The current {@link LoggingTool} or generates a new one if there isn't one.
 	 */
-	public abstract void printAll(String s);
+	public static synchronized LoggingTool getLogger() {
+		if ( logger == null ) {
+			logger = new LoggingTool();
+		}
+		return logger;
+	}
 
 	/**
-	 * Generates a printer that prints a String to the console
+	 * Prints a String through the default printer
 	 *
-	 * @return
+	 * @param s
 	 */
-	public static Consumer<String> generateConsolePrinter() {
-		return s -> System.out.println( new Date( System.currentTimeMillis() ).toString() + ": " + s );
+	public static synchronized void print( String s ) {
+		getLogger().printer.accept( s );
+	}
+
+	/**
+	 * Prints a String through all of the printers
+	 *
+	 * @param s
+	 */
+	public static synchronized void printAll( String s ) {
+		for ( Consumer<String> printer : getLogger().printers ) {
+			printer.accept( s );
+		}
+	}
+
+	public synchronized void setDefault( Consumer<String> printer ) {
+		if ( printers.contains( printer ) ) {
+			this.printer = printer;
+		} else {
+			addPrinter( printer );
+			this.printer = printer;
+		}
+	}
+
+	public synchronized ArrayList<Consumer<String>> getPrinters() {
+		return (ArrayList<Consumer<String>>) this.printers.clone();
+	}
+
+	public synchronized void addPrinter( Consumer<String> newPrinter ) {
+		if ( newPrinter != null )
+			printers.add( newPrinter );
+	}
+
+	public synchronized void addAllPrinters( Consumer<String>... printers ) {
+		for ( Consumer<String> printer : printers )
+			if ( printer != null )
+				addPrinter( printer );
+	}
+
+	public synchronized void removePrinter( Consumer<String> printer ) {
+		printers.remove( printer );
+	}
+
+	public synchronized void removeAllPrinters( Consumer<String>... printers ) {
+		this.printers.remove( printers );
+	}
+
+	public synchronized void clearPrinters() {
+		printers.clear();
+		printer = null;
+	}
+
+	/**
+	 * Manages the build-up of log files
+	 */
+	public synchronized void close() {
+
+		logger = null;
+		new Thread( new ClearLogs() ).start();
 	}
 
 	/**
@@ -72,6 +150,7 @@ public abstract class LoggingTool implements Closeable {
 
 	/**
 	 * Generates a log printer that prints to the give {@link File}.
+	 *
 	 * @param outputFile The file for the log printer to print into.
 	 * @return A {@link Consumer} that prints a String into the {@link File}.
 	 */
@@ -99,20 +178,23 @@ public abstract class LoggingTool implements Closeable {
 	}
 
 	/**
-	 * Manages the build-up of log files
+	 * Generates a printer that prints a String to the console
+	 *
+	 * @return
 	 */
-	public void close() {
-		new Thread( new ClearLogs() ).start();
+	public static Consumer<String> generateConsolePrinter() {
+		Consumer<String> printer = s -> {
+			System.out.println( new Date( System.currentTimeMillis() ).toString() + ": " + s );
+		};
+
+		return printer;
 	}
 
-	protected class ClearLogs implements Runnable {
+	@SuppressWarnings( "rawtypes" ) private class ClearLogs extends Task {
 
-		public void run() {
-			try {
-				purgeLogs();
-			} catch ( FileNotFoundException e ) {
-				printAll("Logs could not be cleared");
-			}
+		@Override protected Object call() throws Exception {
+			purgeLogs();
+			return null;
 		}
 
 		private void purgeLogs() throws FileNotFoundException {
@@ -131,8 +213,8 @@ public abstract class LoggingTool implements Closeable {
 			}
 
 			// Deletes empty files
-			for ( File file : filesToDelete ) {
-				file.delete();
+			for ( int i = 0; i < filesToDelete.size(); i++ ) {
+				filesToDelete.get( i ).delete();
 			}
 
 			// Deletes the oldest files until only 5 are left
@@ -154,6 +236,15 @@ public abstract class LoggingTool implements Closeable {
 		 */
 		private boolean getOlder( String left, String right ) {
 			return left.compareTo( right ) < 0;
+		}
+
+		public void succeeded() {
+			super.succeeded();
+		}
+
+		public void failed() {
+			super.failed();
+			print( "Logs could not be cleared" );
 		}
 	}
 }
