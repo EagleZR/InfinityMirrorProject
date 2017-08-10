@@ -19,6 +19,17 @@ public class InfinityMirrorPreview {
 
 	}
 
+	public InfinityMirrorPreview(InfinityMirror currMirror) {
+		this.lightsOn = currMirror.lightsOn;
+		this.whiteLightModeOn = currMirror.whiteLightModeOn;
+
+		this.currMode = currMirror.currMode;
+
+		this.primaryColor = currMirror.primaryColor;
+		this.secondaryColor = currMirror.secondaryColor;
+
+	}
+
 	public InfinityMirror generateInfinityMirror() {
 		return new InfinityMirror( this );
 	}

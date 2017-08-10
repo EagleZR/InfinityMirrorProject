@@ -34,6 +34,7 @@ public class LoggingTool implements Closeable {
 		printers = new ArrayList<>();
 		printers.add( generateConsolePrinter() );
 		printer = printers.get( 0 );
+		new Thread( new ClearLogs() ).start();
 	}
 
 	/**

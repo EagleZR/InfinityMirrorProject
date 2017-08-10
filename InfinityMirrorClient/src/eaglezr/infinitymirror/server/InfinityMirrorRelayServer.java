@@ -12,6 +12,11 @@ public class InfinityMirrorRelayServer {
 	static LoggingTool log = LoggingTool.getLogger();
 	
 	public static void main( String[] args ) {
+		log.addAllPrinters( LoggingTool.generateLogPrinter( "im_server" ) );
+//		log.setDefault( log.getPrinters().get( 1 ) );
 		ServerCommunicator communicator = new ServerCommunicator( port );
+		while(true) {
+			// TODO Check if communicator is still running. If not, start it up again
+		}
 	}
 }

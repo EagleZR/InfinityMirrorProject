@@ -6,17 +6,19 @@ import eaglezr.infinitymirror.support.*;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class ClientController {
 
 	private PanesController panes;
 	private Stage primaryStage;
-	public InfinityMirror currMirror;
+	public InfinityMirror currMirror = new InfinityMirror( InfinityMirror.Mode.SOLID_COLOR_MODE, Color.RED );
+	public InfinityMirrorPreview mirrorBuild = new InfinityMirrorPreview( currMirror );
 	private ClientCommunicator communicator;
 
 	public ClientController( Stage stage ) {
-		communicator = new ClientCommunicator( "192.168.1.158", 11896 );
+		communicator = new ClientCommunicator( "192.168.1.135", 11896 );
 		IMLoggingTool
 				.startLogger( IMLoggingTool.UserTypes.CLIENT, new Label( "" ), IMLoggingTool.Printers.LABEL_PRINTER );
 		this.primaryStage = stage;

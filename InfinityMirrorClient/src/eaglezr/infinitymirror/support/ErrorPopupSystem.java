@@ -1,6 +1,7 @@
 package eaglezr.infinitymirror.support;
 
 import eaglezr.javafx.stages.PopupStage;
+import eaglezr.support.logs.LoggingTool;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -17,7 +18,7 @@ import javafx.stage.Stage;
 public class ErrorPopupSystem {
 
 	private static Stage defaultStage;
-	private static IMLoggingTool logger;
+	private static LoggingTool logger;
 
 	/**
 	 * Sets the default {@link Stage} that the pop-up windows will be displayed over. This is useful for simplifying
@@ -37,7 +38,7 @@ public class ErrorPopupSystem {
 	 *
 	 * @param setLogger The {@link LoggingTool} that the pop-up text will be echoed in.
 	 */
-	public static void setLogger( IMLoggingTool setLogger ) {
+	public static void setLogger( LoggingTool setLogger ) {
 		logger = setLogger;
 	}
 
@@ -85,7 +86,7 @@ public class ErrorPopupSystem {
 	 * @param stage The stage over which the error will be shown.
 	 */
 	public static void displayError( Error error, Stage stage ) {
-		displayMessage( error.getText(), stage );
+		displayMessage( error.toString(), stage );
 	}
 
 	/**

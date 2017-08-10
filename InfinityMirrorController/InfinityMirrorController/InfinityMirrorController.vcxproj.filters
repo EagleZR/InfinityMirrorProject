@@ -17,5 +17,9 @@
   <ItemGroup>
     <None Include="InfinityMirrorController.ino" />
   </ItemGroup>
- 
+  <ItemGroup>
+    <ClInclude Include="__vm\.InfinityMirrorController.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

@@ -6,7 +6,7 @@ public abstract class Communicator implements Closeable {
 
 	public enum CommunicatorType {
 		CLIENT,
-		SERVER;
+		SERVER
 	}
 
 	protected String url;
@@ -31,9 +31,5 @@ public abstract class Communicator implements Closeable {
 		Byte[] received = new Byte[buffer];
 		// FIXME Add security system
 		return received;
-	}
-	
-	protected void formConnection() throws AccessControlException {
-		// FIXME Add security system
 	}
 }

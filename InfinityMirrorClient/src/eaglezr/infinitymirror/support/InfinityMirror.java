@@ -36,14 +36,14 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 		}
 	}
 
-	private final boolean lightsOn;
-	private final boolean whiteLightModeOn;
+	final boolean lightsOn;
+	final boolean whiteLightModeOn;
 
-	private final Mode currMode;
-	private final Color[] lights;
+	final Mode currMode;
+	final Color[] lights;
 
-	private final Color primaryColor;
-	private final Color secondaryColor;
+	final Color primaryColor;
+	final Color secondaryColor;
 
 	private InfinityMirror( Mode mode ) {
 		this( mode, Color.BLACK, Color.BLACK );
