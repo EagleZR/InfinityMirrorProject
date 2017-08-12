@@ -62,19 +62,20 @@ public class PanesController {
 
 	// LATER Change this so it builds the panel each time
 	public Pane getPane() {
+		IMLoggingTool.print( "Building pane to display." );
 		if ( this.currPane == this.mainMenu ) {
+			IMLoggingTool.print( "Current pane is the main menu." );
 			this.shellPane.updateContainer( currPane );
 			currPane.prefWidthProperty().bind( shellPane.widthProperty() );
 			currPane.prefHeightProperty().bind( shellPane.heightProperty() );
 		} else {
+			IMLoggingTool.print( "Current pane is the " + currPane.getClass().getSimpleName() + "." );
 			this.shellPane.updateContainer( this.subMenuWrapper );
 			this.subMenuWrapper.updateContainer( this.currPane );
 
+			// LATER Maybe find a way to do this just once on setup?
 			this.subMenuWrapper.prefWidthProperty().bind( shellPane.widthProperty() );
 			this.subMenuWrapper.prefHeightProperty().bind( shellPane.heightProperty() );
-
-			//			currPane.prefWidthProperty().bind( this.subMenuWrapper.widthProperty() );
-			//			currPane.prefHeightProperty().bind( this.subMenuWrapper.heightProperty() );
 		}
 		return this.shellPane;
 	}
@@ -82,60 +83,69 @@ public class PanesController {
 	private void initializeEventHandlers() {
 		// Navigation events
 		this.displayMainMenu = event -> {
+			IMLoggingTool.print( "Displaying Main Menu." );
 			this.currPane = mainMenu;
 			controller.updatePanes();
 		};
 
 		this.displaySolidColorPane = event -> {
+			IMLoggingTool.print( "Displaying Solid MyColor Menu." );
 			this.currPane = this.solidColor;
 			controller.updatePanes();
 		};
 
 		this.displayAlternatingColorPane = event -> {
+			IMLoggingTool.print( "Displaying Alternating MyColor Menu." );
 			this.currPane = this.alternateColor;
 			controller.updatePanes();
 		};
 
 		this.displayRainbowPane = event -> {
+			IMLoggingTool.print( "Displaying Rainbow Menu." );
 			this.currPane = this.rainbow;
 			controller.updatePanes();
 		};
 
 		this.displayRainbowPulsePane = event -> {
+			IMLoggingTool.print( "Displaying Rainbow Pulse Menu." );
 			this.currPane = this.rainbowPulse;
 			controller.updatePanes();
 		};
 
 		this.displayPulsePane = event -> {
+			IMLoggingTool.print( "Displaying Pulse Menu." );
 			this.currPane = this.pulse;
 			controller.updatePanes();
 		};
 
 		// Functional events
 		this.toggleLights = event -> {
+			IMLoggingTool.print( "Toggling lights." );
 			InfinityMirror newMirror = controller.currMirror.getToggleLights();
 			controller.pushMirror( newMirror );
 		};
 
 		this.toggleWhiteLight = event -> {
+			IMLoggingTool.print( "Toggling white lights." );
 			InfinityMirror newMirror = controller.currMirror.getToggleWhiteLightMode();
 			controller.pushMirror( newMirror );
 		};
 
 		this.pushMirror = event -> {
-			IMLoggingTool.getLogger().print( "Pushing " + this.currPane.getClass().getSimpleName() );
+			IMLoggingTool.print( "Pushing " + this.currPane.getClass().getSimpleName() );
 		};
 
 		// Control Events
 		this.displayHelp = event -> {
-
+			IMLoggingTool.print( "Displaying Help menu." );
 		};
 
 		this.displaySettings = event -> {
-
+			IMLoggingTool.print( "Displaying Settings menu." );
 		};
 
 		this.exit = event -> {
+			IMLoggingTool.print( "" );
 			this.controller.exit();
 		};
 	}
@@ -185,20 +195,20 @@ public class PanesController {
 		this.mainMenu.whiteLightModeButton.setOnAction( this.toggleWhiteLight );
 
 		///////////////////
-		// Solid Color Panel
+		// Solid MyColor Panel
 		///////////////////
 
-		// Solid Color navigation
+		// Solid MyColor navigation
 
-		// Solid Color functionality
+		// Solid MyColor functionality
 
 		///////////////////
-		// Alternate Color Panel
+		// Alternate MyColor Panel
 		///////////////////
 
-		// Alternate Color navigation
+		// Alternate MyColor navigation
 
-		// Alternate Color functionality
+		// Alternate MyColor functionality
 
 		///////////////////
 		// Rainbow Panel
@@ -224,16 +234,6 @@ public class PanesController {
 
 		// Pulse functionality
 
-	}
-
-	public void toggleLights( boolean isOn ) {
-		this.mainMenu.toggleLights( isOn );
-		this.shellPane.toggleLights( isOn );
-	}
-
-	public void toggleWhiteLight( boolean isWhite ) {
-		this.mainMenu.toggleWhiteLight( isWhite );
-		this.shellPane.toggleWhiteLight( isWhite );
 	}
 
 }

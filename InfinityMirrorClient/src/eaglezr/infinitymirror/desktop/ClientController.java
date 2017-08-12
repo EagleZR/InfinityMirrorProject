@@ -18,13 +18,18 @@ public class ClientController {
 	private ClientCommunicator communicator;
 
 	public ClientController( Stage stage ) {
-		communicator = new ClientCommunicator( "192.168.1.135", 11896 );
 		IMLoggingTool
 				.startLogger( IMLoggingTool.UserTypes.CLIENT, new Label( "" ), IMLoggingTool.Printers.LABEL_PRINTER );
+		IMLoggingTool.print( "Initializing new InfinityMirror Desktop Client." );
+		IMLoggingTool.print( "Initializing new ClientCommunicator." );
+		communicator = new ClientCommunicator( "192.168.10.1", 11896 );
 		this.primaryStage = stage;
+		IMLoggingTool.print( "Initializing ErrorPopupSystem." );
 		ErrorPopupSystem.setDefaultStage( stage );
 		ErrorPopupSystem.setLogger( IMLoggingTool.getLogger() );
+		IMLoggingTool.print( "Creating PanesController." );
 		this.panes = new PanesController( this );
+		IMLoggingTool.print( "Displaying Scene." );
 		Scene scene = new Scene( panes.getPane(), 300, 400 );
 
 		this.primaryStage.setScene( scene );
@@ -40,10 +45,12 @@ public class ClientController {
 	}
 
 	public void updatePanes() {
+		IMLoggingTool.print( "Updating Scene." );
 		primaryStage.getScene().setRoot( panes.getPane() );
 	}
 
 	public void exit() {
+		IMLoggingTool.print( "Exiting." );
 		Platform.exit();
 	}
 }

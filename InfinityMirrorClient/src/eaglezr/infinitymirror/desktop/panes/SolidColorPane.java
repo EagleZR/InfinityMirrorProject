@@ -18,7 +18,7 @@ public class SolidColorPane extends Pane {
 		colorPicker = new ColorPicker();
 		colorPicker.setOnAction( event -> primaryColor = colorPicker.getValue() );
 		contentPane.setTop( colorPicker );
-		startSolidColorModeButton = new Button( "Start Solid Color Mode" );
+		startSolidColorModeButton = new Button( "Start Solid MyColor Mode" );
 		// startSolidColorModeButton.setOnAction(event -> {
 		// sendMessage(ClientCommands.SOLID_COLOR_MODE.COMMAND);
 		// // TODO Find out how to transmit colors

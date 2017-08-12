@@ -15,6 +15,7 @@ public class ClientCommunicator extends Communicator {
 
 	private static ListenerService listener;
 	private IMLoggingTool log;
+	// FIXME Add Certificates, Keys, Encryption (with keys)
 
 	public ClientCommunicator( String url, int port ) {
 		super( url, port );
@@ -28,6 +29,12 @@ public class ClientCommunicator extends Communicator {
 		Thread sendMessageThread = new Thread( new SendMirrorTask( mirror ) );
 		sendMessageThread.setName( "Infinity Mirror Client Push" );
 		sendMessageThread.start();
+	}
+
+	private boolean connectToServer( DataInputStream in, DataOutputStream out ) {
+		// LATER Client: Connect to server
+		IMLoggingTool.print( "DON'T FORGET SECURITY!!!!!!!!" );
+		return true;
 	}
 
 	public void close() {
@@ -47,34 +54,35 @@ public class ClientCommunicator extends Communicator {
 		@Override protected Object call() throws Exception {
 			successful = false;
 			try {
-				log.print( "Pushing mirror." );
+				IMLoggingTool.print( "Pushing mirror." );
 				Socket socket = new Socket( url, port );
 				DataInputStream in = new DataInputStream( socket.getInputStream() );
 				DataOutputStream out = new DataOutputStream( socket.getOutputStream() );
 				if ( connectToServer( in, out ) ) {
 					String challenge = in.readUTF();
-					log.print( "Read \"" + challenge + "\" from the server." );
+					IMLoggingTool.print( "Read \"" + challenge + "\" from the server." );
 					if ( challenge.equals( "State purpose." ) ) {
-						log.print( "Sending \"2\" to the server." );
-						// out.writeInt( 2 );
+						IMLoggingTool.print( "Sending \"2\" to the server." );
+						out.writeInt( 2 );
 						try {
 							ObjectOutputStream o_out = new ObjectOutputStream( socket.getOutputStream() );
+							o_out.flush();
 							try {
-								log.print( "Sending mirror to the server." );
+								IMLoggingTool.print( "Sending mirror to the server." );
 								o_out.writeObject( mirror );
 								successful = in.readBoolean();
-								log.print( "Read \"" + successful + "\" from the server." );
+								IMLoggingTool.print( "Read \"" + successful + "\" from the server." );
 							} catch ( IOException e ) {
-								log.print( "Unable to send through ObjectOutputStream" );
+								IMLoggingTool.print( "Unable to send through ObjectOutputStream." );
 							}
 							if ( successful ) {
-								log.print( "Mirror successfully pushed." );
+								IMLoggingTool.print( "Mirror successfully pushed." );
 							} else {
-								log.print( "Mirror could not be pushed." );
+								IMLoggingTool.print( "Mirror could not be pushed." );
 							}
 
 						} catch ( IOException e ) {
-							log.print( "Failed to create ObjectOutputStream" );
+							IMLoggingTool.print( "Failed to create ObjectOutputStream" );
 						}
 					} else if ( challenge.equals( "Access denied." ) ) {
 						// LATER EMS: "Unable to authenticate with server." error.
@@ -84,7 +92,7 @@ public class ClientCommunicator extends Communicator {
 				} else {
 					// LATER EMS: "Unable to authenticate with server."
 				}
-				log.print( "Closing \"Push Mirror Thread\" socket." );
+				IMLoggingTool.print( "Closing \"Push Mirror Thread\" socket." );
 				socket.close();
 			} catch ( IOException e ) {
 				error = Error.CONNECTION_NOT_MADE;
@@ -96,30 +104,24 @@ public class ClientCommunicator extends Communicator {
 			return successful;
 		}
 
-		private boolean connectToServer( DataInputStream in, DataOutputStream out ) {
-			// LATER Client: Connect to server
-			log.print( "DON'T FORGET SECURITY!!!!!!!!" );
-			return true;
-		}
-
 		@Override protected void succeeded() {
 			super.succeeded();
 			if ( error != Error.DEFAULT ) {
-				log.print( "Push Mirror Thread finished with an error." );
+				IMLoggingTool.print( "Push Mirror Thread finished with an error." );
 				ErrorPopupSystem.displayError( error );
 			} else {
-				log.print( "Push Mirror Thread succeeded. Closing Thread." );
+				IMLoggingTool.print( "Push Mirror Thread succeeded. Closing Thread." );
 			}
 		}
 
 		@Override protected void failed() {
 			super.failed();
-			log.print( "Push Mirror Thread failed. Closing Thread." );
+			IMLoggingTool.print( "Push Mirror Thread failed. Closing Thread." );
 			if ( error != Error.DEFAULT ) {
-				log.print( "Push Mirror Thread failed with an error." );
+				IMLoggingTool.print( "Push Mirror Thread failed with an error." );
 				ErrorPopupSystem.displayError( error );
 			} else {
-				log.print( "Push Mirror Thread succeeded. Closing Thread." );
+				IMLoggingTool.print( "Push Mirror Thread succeeded. Closing Thread." );
 			}
 		}
 	}
@@ -195,6 +197,13 @@ public class ClientCommunicator extends Communicator {
 
 			@Override protected Object call() throws Exception {
 				// FIXME Listen for a signal from the server
+				Socket socket = new Socket( url, port );
+				DataOutputStream out = new DataOutputStream( socket.getOutputStream() );
+				DataInputStream in = new DataInputStream( socket.getInputStream() );
+
+				connectToServer( in, out );
+				out.writeInt( 1 );
+
 
 				return null;
 			}

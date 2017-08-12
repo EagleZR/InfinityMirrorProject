@@ -11,11 +11,10 @@ import java.util.concurrent.Executor;
 
 public class ServerCommunicator extends Communicator {
 
-	// TODO Way to communicate with thread?
 	private Listener listener;
 	private ArrayList<ConnectionThread> connections = new ArrayList<>();
 	public InfinityMirrorWrapper imWrapper = new InfinityMirrorWrapper();
-	private LoggingTool log;
+	// FIXME Add Certs, Keys, Encryption (using keys), and store user certs (for identity?)
 
 	/**
 	 * Creates a {@link ServerCommunicator} that listens on a specified port.
@@ -24,8 +23,7 @@ public class ServerCommunicator extends Communicator {
 	 */
 	public ServerCommunicator( int listeningPort ) {
 		super( listeningPort );
-		log = LoggingTool.getLogger();
-		log.print( "Making a new ServerCommunicator on port: " + port );
+		LoggingTool.print( "Making a new ServerCommunicator on port: " + port );
 		listener = new Listener( listeningPort );
 		Thread listeningThread = new Thread( listener );
 		listeningThread.start();
@@ -124,21 +122,14 @@ public class ServerCommunicator extends Communicator {
 		public void run() {
 			while ( true ) {
 				try {
-					log.print( "Server is now waiting for a connection" );
+					LoggingTool.print( "Server is now waiting for a connection" );
 					Socket connection = serverSocket.accept();
-					log.print( "A connection has been made" );
+					LoggingTool.print( "A connection has been made" );
 					startNewConnectionThread( new ConnectionThread( connection ) );
 				} catch ( IOException e ) {
-					log.print( "Unable to form connection." );
+					LoggingTool.print( "Unable to form connection." );
 				}
 			}
-		}
-
-		/**
-		 * Notify clients that a change has been made by another client.
-		 */
-		private void notifyClients() {
-			// TODO Probably need to move this elsewhere...
 		}
 	}
 
@@ -151,7 +142,7 @@ public class ServerCommunicator extends Communicator {
 		Socket connection;
 
 		public ConnectionThread( Socket connection ) {
-			log.print( "Opening a new connection with " + connection.getInetAddress() );
+			LoggingTool.print( "Opening a new connection with " + connection.getInetAddress() );
 			this.connection = connection;
 		}
 
@@ -165,31 +156,31 @@ public class ServerCommunicator extends Communicator {
 				DataOutputStream out = new DataOutputStream( connection.getOutputStream() );
 				if ( validateClient( in, out ) ) {
 					out.writeUTF( "State purpose." ); // LATER Better way to do this?
-					int purpose = in.read();
-					log.print( "Client responded with stated purpose: " + purpose );
+					int purpose = in.readInt();
+					LoggingTool.print( "Client responded with stated purpose: " + purpose );
 					if ( purpose == 1 ) {
-						log.print( "Interpretation: Client is requesting status." );
+						LoggingTool.print( "Interpretation: Client is requesting status." );
 						handleRequestStatus( in, out );
 					} else if ( purpose == 2 ) {
-						log.print( "Interpretation: Client is pushing a new mirror." );
+						LoggingTool.print( "Interpretation: Client is pushing a new mirror." );
 						acceptMirror( in, out, new ObjectInputStream( connection.getInputStream() ) );
 					} else if ( purpose == 3 ) {
-						log.print( "Interpretation: Client is requesting the current mirror." );
+						LoggingTool.print( "Interpretation: Client is requesting the current mirror." );
 						sendMirror( in, out, new ObjectOutputStream( connection.getOutputStream() ) );
 					} else {
-						log.print( "Stated purpose not recognized." );
+						LoggingTool.print( "Stated purpose not recognized." );
 					}
 				} else {
 					out.writeUTF( "Access denied." );
-					log.print( "An attempted connection did not pass security and was denied." );
+					LoggingTool.print( "An attempted connection did not pass security and was denied." );
 				}
 			} catch ( IOException e ) {
-				log.print( "Unable to create DataStreams." );
+				LoggingTool.print( "Unable to create DataStreams." );
 			}
 			try {
 				connection.close();
 			} catch ( IOException e ) {
-				log.print( "Unable to close the connection." );
+				LoggingTool.print( "Unable to close the connection." );
 			}
 		}
 
@@ -197,7 +188,7 @@ public class ServerCommunicator extends Communicator {
 		 * When a connection is made, this method validates that the client is an authorized user.
 		 */
 		private boolean validateClient( DataInputStream in, DataOutputStream out ) {
-			log.print( "DON'T FORGET SECURITY!!!!!!!" );
+			LoggingTool.print( "DON'T FORGET SECURITY!!!!!!!" );
 			return true; // LATER Validate clients.
 		}
 
@@ -206,7 +197,8 @@ public class ServerCommunicator extends Communicator {
 		 * connection.
 		 */
 		private void handleRequestStatus( DataInputStream in, DataOutputStream out ) {
-			log.print( "IM Status was requested by a client. That functionality has not yet been implemented." );
+			LoggingTool
+					.print( "IM Status was requested by a client. That functionality has not yet been implemented." );
 			// TODO Handle Status Request
 		}
 
@@ -214,14 +206,25 @@ public class ServerCommunicator extends Communicator {
 		 * This method handles processes and communications for when a client wants to push a new mirror.
 		 */
 		private void acceptMirror( DataInputStream in, DataOutputStream out, ObjectInputStream o_in ) {
+			boolean successful = false;
 			try {
+				LoggingTool.print( "Beginning to read the mirror." );
 				InfinityMirror newMirror = (InfinityMirror) o_in.readObject();
+				LoggingTool.print( "The mirror has been successfully read." );
 				imWrapper.setCurrMirror( newMirror );
-				out.writeBoolean( true );
+				successful = true;
 			} catch ( IOException e ) {
-				log.print( "There was an error opening the ObjectInputStream." );
+				LoggingTool.print( "There was an error opening the ObjectInputStream." );
+				LoggingTool.print( e.getMessage() );
 			} catch ( ClassNotFoundException e ) {
-				log.print( "There was an error in recognizing the class while receiving a new mirror." );
+				LoggingTool.print( "There was an error in recognizing the class while receiving a new mirror." );
+			}
+
+			try {
+				out.writeBoolean( successful );
+			} catch ( IOException e ) {
+				LoggingTool
+						.print( "There was an error responding to the client after attempting to accept the mirror. " );
 			}
 		}
 
@@ -235,23 +238,11 @@ public class ServerCommunicator extends Communicator {
 					o_out.writeObject( imWrapper.getCurrMirror() );
 					successful = in.readBoolean();
 					// LATER Read client response?
-					log.print( "The current mirror was successfully sent to the client" );
+					LoggingTool.print( "The current mirror was successfully sent to the client" );
 				}
 			} catch ( IOException e ) {
-				log.print( "There was an error opening the ObjectInputStream." );
+				LoggingTool.print( "There was an error opening the ObjectInputStream." );
 			}
-		}
-	}
-
-	/**
-	 * Executor to handle the execution and termination of threads in the {@link ServerCommunicator}.
-	 */
-	private class ServerExecutor implements Executor {
-
-		ArrayList<Thread> threads = new ArrayList<>();
-
-		public synchronized void execute( Runnable runnable ) {
-
 		}
 	}
 }

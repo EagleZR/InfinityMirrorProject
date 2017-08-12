@@ -40,10 +40,10 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 	final boolean whiteLightModeOn;
 
 	final Mode currMode;
-	final Color[] lights;
+	// final Color[] lights;
 
-	final Color primaryColor;
-	final Color secondaryColor;
+	final MyColor primaryColor;
+	final MyColor secondaryColor;
 
 	private InfinityMirror( Mode mode ) {
 		this( mode, Color.BLACK, Color.BLACK );
@@ -57,18 +57,18 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 
 	public InfinityMirror( Mode mode, Color primaryColor, Color secondaryColor ) {
 		this.currMode = mode;
-		this.primaryColor = primaryColor;
-		this.secondaryColor = secondaryColor;
+		this.primaryColor = new MyColor( primaryColor );
+		this.secondaryColor = new MyColor( secondaryColor );
 		this.lightsOn = true;
 		this.whiteLightModeOn = false;
-		this.lights = setLights( new Color[180], getMode(), getPrimaryColor(), getSecondaryColor() );
+		//this.lights = setLights( new Color[180], getMode(), getPrimaryColor(), getSecondaryColor() );
 	}
 
 	private InfinityMirror( InfinityMirror mirror, boolean lightsOn, boolean whiteLightModeOn ) {
 		this.lightsOn = lightsOn;
 		this.whiteLightModeOn = whiteLightModeOn;
 		this.currMode = mirror.currMode;
-		this.lights = setLights( new Color[180], getMode(), getPrimaryColor(), getSecondaryColor() );
+		//this.lights = setLights( new Color[180], getMode(), getPrimaryColor(), getSecondaryColor() );
 		this.primaryColor = mirror.primaryColor;
 		this.secondaryColor = mirror.secondaryColor;
 	}
@@ -77,9 +77,9 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 		this.lightsOn = preview.lightsOn;
 		this.whiteLightModeOn = preview.whiteLightModeOn;
 		this.currMode = preview.currMode;
-		this.lights = setLights( new Color[180], getMode(), getPrimaryColor(), getSecondaryColor() );
-		this.primaryColor = preview.primaryColor;
-		this.secondaryColor = preview.secondaryColor;
+		//this.lights = setLights( new Color[180], getMode(), getPrimaryColor(), getSecondaryColor() );
+		this.primaryColor = new MyColor( preview.primaryColor );
+		this.secondaryColor = new MyColor( preview.secondaryColor );
 	}
 
 	/**
@@ -91,15 +91,15 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 		return ( this.lightsOn ? ( this.whiteLightModeOn ? Mode.WHITE_MODE : this.currMode ) : Mode.LIGHTS_OFF );
 	}
 
-	public Color[] getLights() {
-		if ( !this.lightsOn ) {
-			return setAllLights( new Color[180], Color.BLACK );
-		} else if ( this.whiteLightModeOn ) {
-			return setAllLights( new Color[180], Color.WHITE );
-		} else {
-			return this.lights;
-		}
-	}
+//	public Color[] getLights() {
+//		if ( !this.lightsOn ) {
+//			return setAllLights( new Color[180], Color.BLACK );
+//		} else if ( this.whiteLightModeOn ) {
+//			return setAllLights( new Color[180], Color.WHITE );
+//		} else {
+//			//return this.lights;
+//		}
+//	}
 
 	public Color getPrimaryColor() {
 		if ( !this.lightsOn ) {
@@ -107,7 +107,7 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 		} else if ( this.whiteLightModeOn ) {
 			return Color.WHITE;
 		} else {
-			return this.primaryColor;
+			return this.primaryColor.getColor();
 		}
 	}
 
@@ -117,7 +117,7 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 		} else if ( this.whiteLightModeOn ) {
 			return Color.WHITE;
 		} else {
-			return this.secondaryColor;
+			return this.secondaryColor.getColor();
 		}
 	}
 
@@ -143,8 +143,8 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 		total += compare( this.whiteLightModeOn, m2.whiteLightModeOn );
 		total += this.currMode.compareTo( m2.currMode );
 		// Ignore comparing lights. It's a derived value, anyways.
-		total += compare( this.primaryColor, m2.primaryColor );
-		total += compare( this.secondaryColor, m2.secondaryColor );
+		total += compare( this.primaryColor.getColor(), m2.primaryColor.getColor() );
+		total += compare( this.secondaryColor.getColor(), m2.secondaryColor.getColor() );
 		return total;
 	}
 
@@ -181,7 +181,7 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 
 	private static Color[] setAllLights( Color[] lights, Color color ) {
 		if ( color == null ) {
-			// LATER Print "Null Color" error to log
+			// LATER Print "Null MyColor" error to log
 		} else {
 			for ( int i = 0; i < lights.length; i++ ) {
 				lights[i] = color;
@@ -192,9 +192,9 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 
 	private static Color[] setAlternateLights( Color[] lights, Color color1, Color color2 ) {
 		if ( color1 == null ) {
-			// LATER Print "Null Primary Color" error to log
+			// LATER Print "Null Primary MyColor" error to log
 		} else if ( color2 == null ) {
-			// LATER Print "Null Secondary Color" error to log
+			// LATER Print "Null Secondary MyColor" error to log
 		} else {
 			for ( int i = 0; i < lights.length; i++ ) {
 				if ( i % 2 == 0 ) {
@@ -214,5 +214,45 @@ public final class InfinityMirror implements Serializable, Comparable<InfinityMi
 
 	private static int compare( Color c1, Color c2 ) {
 		return c1.toString().compareTo( c2.toString() );
+	}
+
+	public static class MyColor implements Serializable {
+
+		private static final long serialVersionUID = -6377660736345177025L;
+		private double red;
+		private double green;
+		private double blue;
+		private double opacity;
+
+		public MyColor( Color color ) {
+			this.red = color.getRed();
+			this.blue = color.getBlue();
+			this.green = color.getGreen();
+			this.opacity = color.getOpacity();
+		}
+
+		public MyColor(double red, double green, double blue, double opacity) {
+			this.red = red;
+			this.green = green;
+			this.blue = blue;
+			this.opacity = opacity;
+		}
+
+		public Color getColor () {
+			return new Color( red, green, blue, opacity );
+		}
+
+		public double getRed() {
+			return this.red;
+		}
+
+		public double getBlue() {
+			return this.blue;
+		}
+
+		public double getGreen() {
+			return this.green;
+		}
+
 	}
 }

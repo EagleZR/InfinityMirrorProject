@@ -25,8 +25,8 @@ public class InfinityMirrorPreview {
 
 		this.currMode = currMirror.currMode;
 
-		this.primaryColor = currMirror.primaryColor;
-		this.secondaryColor = currMirror.secondaryColor;
+		this.primaryColor = currMirror.primaryColor.getColor();
+		this.secondaryColor = currMirror.secondaryColor.getColor();
 
 	}
 

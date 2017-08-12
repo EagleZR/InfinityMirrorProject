@@ -52,7 +52,7 @@ public class IMPane extends BorderPane {
 		// Initialize Mirror
 		// Rectangle[] lights = new Rectangle[180];
 		// for ( int i = 0; i < lights.length; i++ ) {
-		// lights[i] = new Rectangle( 4, 4, Color.RED );
+		// lights[i] = new Rectangle( 4, 4, MyColor.RED );
 		// }
 
 		BorderPane pane = new BorderPane();
@@ -104,7 +104,7 @@ public class IMPane extends BorderPane {
 			Menu goToViewMenu = new Menu( "Go To" );
 
 			goToMain = new MenuItem( "Main Menu" );
-			goToAltColor = new MenuItem( "Alternating Color" );
+			goToAltColor = new MenuItem( "Alternating MyColor" );
 			// TODO Add other MenuItems to the View tab
 
 			goToViewMenu.getItems().addAll( goToMain, goToAltColor );

@@ -23,8 +23,8 @@ public class MainMenuPane extends Pane {
 		Label instructionalLabel = new Label( "Select the desired mode: " );
 		
 		// Create modal control buttons
-		solidColorModeButton = new Button( "Solid Color Mode" );
-		alternatingColorModeButton = new Button( "Alternating Color Mode" );
+		solidColorModeButton = new Button( "Solid MyColor Mode" );
+		alternatingColorModeButton = new Button( "Alternating MyColor Mode" );
 		rainbowModeButton = new Button( "Rainbow Mode" );
 		rainbowPulseModeButton = new Button( "Rainbow Pulse Mode" );
 		pulseModeButton = new Button( "Pulse Mode" );
