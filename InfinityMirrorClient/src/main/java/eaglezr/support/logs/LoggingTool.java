@@ -23,7 +23,6 @@ public class LoggingTool implements Closeable {
 
 	// LATER Check if there is a to save/load this from a file
 	private static int NUM_LOGS_TO_KEEP = 5;
-	protected static LoggingTool logger;
 	protected Consumer<String> printer;
 	protected ArrayList<Consumer<String>> printers;
 
@@ -108,7 +107,6 @@ public class LoggingTool implements Closeable {
 	 * Manages the build-up of log files
 	 */
 	public synchronized void close() {
-
 		logger = null;
 		new Thread( new ClearLogs() ).start();
 	}
